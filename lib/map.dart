@@ -1,0 +1,115 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:test_app/model/CarparkInfo.dart';
+
+import 'model/CarparkCSV.dart';
+
+class MapView extends StatefulWidget {
+  @override
+  _MapViewState createState() => _MapViewState();
+}
+
+class _MapViewState extends State<MapView> {
+  final Completer<GoogleMapController> _controller = Completer();
+  static final CameraPosition _singapore = CameraPosition(
+      bearing: 0, target: LatLng(1.3521, 103.8198), tilt: 0, zoom: 12);
+
+  final Map<String, Marker> _markers = {};
+  Future<void> _onMapCreated(GoogleMapController controller) async {
+    var carparkList = await CarParkCSV.data();
+    setState(() {
+      _markers.clear();
+
+      for (var i = 0; i < carparkList.length; i++){
+        final carpark = carparkList[i];
+        final marker = Marker(
+          markerId: MarkerId(carpark.carparkCode),
+          position: LatLng(carpark.lat, carpark.lng),
+          infoWindow: InfoWindow(
+            title: carpark.carparkCode,
+            snippet: '${carpark.address}, ${carpark.carparkPaymentMethod}, ${carpark.carparkType}, ${carpark.shortTermParking}',
+          ),
+        );
+        _markers[carpark.carparkCode] = marker;
+      }
+    });
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('ParkBuddy Home'),
+        backgroundColor: const Color(0x11000000),
+        elevation: 0,
+      ),
+      body: GoogleMap(
+        mapType: MapType.normal,
+        initialCameraPosition: _singapore,
+        onMapCreated: (GoogleMapController controller) async {
+          _controller.complete(controller);
+          if (await Permission.location.isGranted){
+            await _onMapCreated(controller);
+          } else {
+            await Permission.location.request();
+            var isShown = await Permission.contacts.shouldShowRequestRationale;
+            await _onMapCreated(controller);
+          }
+        },
+
+        markers: _markers.values.toSet(),
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
+        zoomControlsEnabled: false,
+
+      ),
+      extendBodyBehindAppBar: true,
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_parking),
+            label: 'Parking Lots',
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _zoomToCurrentLocation,
+        child: Icon(Icons.location_on),
+        elevation: 2,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
+    );
+  }
+
+  void _zoomToCurrentLocation() async {
+    final controller = await _controller.future;
+    LocationData currentLocation;
+    var location = Location();
+    try {
+      currentLocation = await location.getLocation();
+    } on Exception {
+      currentLocation = null;
+    }
+
+    await controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        bearing: 0,
+        target: LatLng(currentLocation.latitude, currentLocation.longitude),
+        zoom: await controller.getZoomLevel()+1,
+      ),
+    ));
+  }
+
+
+
+}
