@@ -1,5 +1,6 @@
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart';
+import 'package:geodesy/geodesy.dart';
 import 'package:test_app/model/CarparkInfo.dart';
 import 'package:test_app/model/CarparkPaymentMethod.dart';
 import 'package:test_app/model/CarparkType.dart';
@@ -7,17 +8,19 @@ import 'package:test_app/model/ShortTermParkingAvailability.dart';
 
 
 class CarParkCSV {
-  static Future<List> data() async {
+  static List<CarparkInfo> carparkList = List<CarparkInfo>();
+
+  static Future<List> loadData() async {
     final carparkData = await rootBundle.loadString('assets/hdb-carpark-information-latlng.csv', cache: true);
+
     if (carparkData.isEmpty){
       throw Exception('No csv found');
     }
 
     final res = const CsvToListConverter().convert(carparkData);
-    final carparkList = [];
     for (var i = 1; i < res.length; i++) {
       CarparkType carparkType;
-      switch(res[i][4]) {
+      switch (res[i][4]) {
         case 'BASEMENT CAR PARK':
           carparkType = CarparkType.basement;
           break;
@@ -43,7 +46,7 @@ class CarParkCSV {
 
       CarparkPaymentMethod paymentMethod;
 
-      switch(res[i][5]) {
+      switch (res[i][5]) {
         case 'ELECTRONIC PARKING':
           paymentMethod = CarparkPaymentMethod.electronicParking;
           break;
@@ -54,18 +57,21 @@ class CarParkCSV {
 
       ShortTermParkingAvailability shortTermParkingAvailability;
 
-      switch(res[i][6]) {
+      switch (res[i][6]) {
         case 'WHOLE DAY':
           shortTermParkingAvailability = ShortTermParkingAvailability.wholeDay;
           break;
         case '7AM-7PM':
-          shortTermParkingAvailability = ShortTermParkingAvailability.morning7am_7pm;
+          shortTermParkingAvailability =
+              ShortTermParkingAvailability.morning7am_7pm;
           break;
         case '7AM-10.30PM':
-          shortTermParkingAvailability = ShortTermParkingAvailability.morning7am_1030pm;
+          shortTermParkingAvailability =
+              ShortTermParkingAvailability.morning7am_1030pm;
           break;
         case 'NO':
-          shortTermParkingAvailability = ShortTermParkingAvailability.unavailable;
+          shortTermParkingAvailability =
+              ShortTermParkingAvailability.unavailable;
           break;
       }
 
@@ -75,16 +81,24 @@ class CarParkCSV {
       var carparkInfo = CarparkInfo(
         res[i][0],
         res[i][1],
-        double.parse(res[i][2].toString()),
-        double.parse(res[i][3].toString()),
+        LatLng(double.parse(res[i][2].toString()),
+            double.parse(res[i][3].toString())),
         carparkType,
         paymentMethod,
         shortTermParkingAvailability,
       );
       carparkList.add(carparkInfo);
+
     }
-    print(carparkList);
     return carparkList;
+  }
+
+  static List<CarparkInfo> dataFilteredByDistance (List<CarparkInfo> dataList, num limitInKM, LatLng currentPos) {
+    Geodesy geodesy = Geodesy();
+    if (dataList.length == null) {
+      throw Exception('Carpark list empty.');
+    }
+    return dataList.where((carpark) => geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) < limitInKM*1000).toList();
   }
 
   // void _convertXYtoLatLngFromCSV async() {
