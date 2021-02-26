@@ -9,6 +9,8 @@ class RouteGenerator {
       case '/':
         return MaterialPageRoute(builder: (_) => MapView());
         break;
+      case '/carparkinfopage':
+        break;
       default:
         return _errorRoute();
     }
