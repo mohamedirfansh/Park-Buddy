@@ -11,6 +11,8 @@ class RouteGenerator {
         break;
       case '/carparkinfopage':
         break;
+      case '/listview':
+        break;
       default:
         return _errorRoute();
     }

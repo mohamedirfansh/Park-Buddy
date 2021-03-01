@@ -23,7 +23,8 @@ class _MapViewState extends State<MapView> {
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
     var location = await Location().getLocation();
-    var filteredList = CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList, 0.5, geo.LatLng(location.latitude, location.longitude));
+    var filteredList = CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
+        0.5, geo.LatLng(location.latitude, location.longitude));
 
     _refreshMarkers(filteredList);
   }
@@ -50,7 +51,7 @@ class _MapViewState extends State<MapView> {
         initialCameraPosition: _singapore,
         onMapCreated: (GoogleMapController controller) async {
           _controller.complete(controller);
-          if (await Permission.location.isGranted){
+          if (await Permission.location.isGranted) {
             await _onMapCreated(controller);
           } else {
             await Permission.location.request();
@@ -58,30 +59,17 @@ class _MapViewState extends State<MapView> {
             await _onMapCreated(controller);
           }
         },
-
         markers: _markers.values.toSet(),
         myLocationEnabled: true,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
-
       ),
       extendBodyBehindAppBar: true,
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map_rounded),
-            label: 'Map View',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'List View',
 
-            //TODO: parking lot list
-              //TODO: connect each entry to carpark info page (same widget as map view)
-                // TODO: onpress/ontap: Navigator.pushNamed(context, '/carparkinfopage', arguments ['HB12']);
-          ),
-        ],
-      ),
+      //TODO: parking lot list
+      //         //TODO: connect each entry to carpark info page (same widget as map view)
+      //           // TODO: onpress/ontap: Navigator.pushNamed(context, '/carparkinfopage', arguments ['HB12']);
+
       floatingActionButton: FloatingActionButton(
         onPressed: _zoomToCurrentLocation,
         child: Icon(Icons.location_on),
@@ -91,22 +79,23 @@ class _MapViewState extends State<MapView> {
     );
   }
 
-  Map<String, Marker> _fillDataToMarkers(Map<String, Marker> markers, List<CarparkInfo> data) {
-    for (var i = 0; i < data.length; i++){
+  Map<String, Marker> _fillDataToMarkers(
+      Map<String, Marker> markers, List<CarparkInfo> data) {
+    for (var i = 0; i < data.length; i++) {
       final carpark = data[i];
       final marker = Marker(
         markerId: MarkerId(carpark.carparkCode),
         position: LatLng(carpark.latlng.latitude, carpark.latlng.longitude),
         infoWindow: InfoWindow(
           title: carpark.carparkCode,
-          snippet: '${carpark.address}, ${carpark.carparkPaymentMethod}, ${carpark.carparkType}, ${carpark.shortTermParking}',
+          snippet:
+              '${carpark.address}, ${carpark.carparkPaymentMethod}, ${carpark.carparkType}, ${carpark.shortTermParking}',
           //TODO: add dynamic carpark info page route
           //TODO: histogram
           //TODO: UI for lot availability
           //TODO: backend for querying carpark API (able to query any
           onTap: () => print('tapped carpark ${carpark.carparkCode}'),
         ),
-
       );
       markers[carpark.carparkCode] = marker;
     }
@@ -124,7 +113,8 @@ class _MapViewState extends State<MapView> {
       currentLocation = null;
     }
 
-    _refreshMarkers(CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList, 0.5, geo.LatLng(currentLocation.latitude, currentLocation.longitude)));
+    _refreshMarkers(CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
+        0.5, geo.LatLng(currentLocation.latitude, currentLocation.longitude)));
 
     await controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
@@ -134,7 +124,4 @@ class _MapViewState extends State<MapView> {
       ),
     ));
   }
-
-
-
 }

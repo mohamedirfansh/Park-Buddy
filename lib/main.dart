@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:test_app/view/TabsPage.dart';
 import 'model/CarparkCSV.dart';
 import 'route_generator.dart';
 import 'view/SearchBar.dart';
+import 'view/TabsPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,11 +17,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ParkBuddy',
       home: Scaffold(
-        body: Stack(
-          children: [
-            SearchBar(),
-          ]
-        ),
+        body: Stack(children: [
+          SearchBar(),
+          TabsPage(),
+        ]),
       ),
       theme: ThemeData(
         primaryColor: const Color(0xFF06E2B3),
