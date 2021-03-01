@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'map.dart';
+import 'package:park_buddy/map.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -10,6 +10,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => MapView());
         break;
       case '/carparkinfopage':
+        break;
+      case '/listview':
         break;
       default:
         return _errorRoute();

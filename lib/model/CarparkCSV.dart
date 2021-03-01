@@ -1,19 +1,19 @@
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart';
 import 'package:geodesy/geodesy.dart';
-import 'package:test_app/model/CarparkInfo.dart';
-import 'package:test_app/model/CarparkPaymentMethod.dart';
-import 'package:test_app/model/CarparkType.dart';
-import 'package:test_app/model/ShortTermParkingAvailability.dart';
-
+import 'package:park_buddy/model/CarparkInfo.dart';
+import 'package:park_buddy/model/CarparkPaymentMethod.dart';
+import 'package:park_buddy/model/CarparkType.dart';
+import 'package:park_buddy/model/ShortTermParkingAvailability.dart';
 
 class CarParkCSV {
   static List<CarparkInfo> carparkList = List<CarparkInfo>();
 
   static Future<List> loadData() async {
-    final carparkData = await rootBundle.loadString('assets/hdb-carpark-information-latlng.csv', cache: true);
+    final carparkData = await rootBundle
+        .loadString('assets/hdb-carpark-information-latlng.csv', cache: true);
 
-    if (carparkData.isEmpty){
+    if (carparkData.isEmpty) {
       throw Exception('No csv found');
     }
 
@@ -88,17 +88,21 @@ class CarParkCSV {
         shortTermParkingAvailability,
       );
       carparkList.add(carparkInfo);
-
     }
     return carparkList;
   }
 
-  static List<CarparkInfo> dataFilteredByDistance (List<CarparkInfo> dataList, num limitInKM, LatLng currentPos) {
+  static List<CarparkInfo> dataFilteredByDistance(
+      List<CarparkInfo> dataList, num limitInKM, LatLng currentPos) {
     Geodesy geodesy = Geodesy();
     if (dataList.length == null) {
       throw Exception('Carpark list empty.');
     }
-    return dataList.where((carpark) => geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) < limitInKM*1000).toList();
+    return dataList
+        .where((carpark) =>
+            geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) <
+            limitInKM * 1000)
+        .toList();
   }
 
   // void _convertXYtoLatLngFromCSV async() {
@@ -141,4 +145,3 @@ class CarParkCSV {
   // }
 
 }
-

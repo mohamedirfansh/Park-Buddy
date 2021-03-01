@@ -1,4 +1,4 @@
-name: test_app
+name: park_buddy
 description: A new Flutter application.
 
 # The following line prevents the package from being accidentally published to
@@ -34,6 +34,8 @@ dependencies:
   location: ^3.2.4
   material_floating_search_bar: ^0.2.6
   geodesy: ^0.3.2
+  geolocator: ^6.2.1
+  flutter_spinkit: ^4.1.2+1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -58,6 +60,7 @@ flutter:
   assets:
     - hdb-carpark-information.csv
     - hdb-carpark-information-latlng.csv
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
