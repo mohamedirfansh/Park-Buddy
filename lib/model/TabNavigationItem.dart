@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/map.dart';
-import 'package:test_app/view/CarparkListView.dart';
+import 'package:park_buddy/map.dart';
+import 'package:park_buddy/view/CarparkListView.dart';
 
 class TabNavigationItem {
   final Widget page;

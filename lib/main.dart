@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/view/TabsPage.dart';
-import 'model/CarparkCSV.dart';
-import 'route_generator.dart';
-import 'view/SearchBar.dart';
-import 'view/TabsPage.dart';
+import 'package:park_buddy/view/TabsPage.dart';
+import 'package:park_buddy/model/CarparkCSV.dart';
+import 'package:park_buddy/route_generator.dart';
+import 'package:park_buddy/view/SearchBar.dart';
 
 void main() {
   runApp(MyApp());

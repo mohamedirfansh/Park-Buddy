@@ -1,18 +1,18 @@
 import 'dart:core';
 import 'package:geodesy/geodesy.dart';
-import 'package:test_app/model/CarparkPaymentMethod.dart';
-import 'package:test_app/model/CarparkType.dart';
-import 'package:test_app/model/ShortTermParkingAvailability.dart';
+import 'package:park_buddy/model/CarparkPaymentMethod.dart';
+import 'package:park_buddy/model/CarparkType.dart';
+import 'package:park_buddy/model/ShortTermParkingAvailability.dart';
 
 class CarparkInfo {
   CarparkInfo(
-      this.carparkCode,
-      this.address,
-      this.latlng,
-      this.carparkType,
-      this.carparkPaymentMethod,
-      this.shortTermParking,
-      );
+    this.carparkCode,
+    this.address,
+    this.latlng,
+    this.carparkType,
+    this.carparkPaymentMethod,
+    this.shortTermParking,
+  );
 
   final String carparkCode;
   final String address;

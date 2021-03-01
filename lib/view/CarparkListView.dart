@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart';
-import 'package:test_app/view/CarparkCard.dart';
-import '../model/CarparkCSV.dart';
+import 'package:park_buddy/view/CarparkCard.dart';
+import 'package:park_buddy/model/CarparkCSV.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 

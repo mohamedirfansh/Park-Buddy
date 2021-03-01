@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../map.dart';
-import './CarparkListView.dart';
-import '../model/TabNavigationItem.dart';
+import 'package:park_buddy/model/TabNavigationItem.dart';
 
 class TabsPage extends StatefulWidget {
   @override

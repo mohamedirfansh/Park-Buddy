@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geodesy/geodesy.dart' as geo;
-import 'package:test_app/model/CarparkInfo.dart';
+import 'package:park_buddy/model/CarparkInfo.dart';
 
 import 'model/CarparkCSV.dart';
 

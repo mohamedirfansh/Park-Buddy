@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/model/CarparkInfo.dart';
+import 'package:park_buddy/model/CarparkInfo.dart';
 
 class CarparkCard extends StatelessWidget {
   final CarparkInfo carpark;
