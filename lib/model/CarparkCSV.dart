@@ -49,7 +49,6 @@ class CarParkCSV {
       }
 
       CarparkPaymentMethod paymentMethod;
-      print("reach3");
       switch (res[i][5]) {
         case 'ELECTRONIC PARKING':
           paymentMethod = CarparkPaymentMethod.electronicParking;
@@ -101,7 +100,6 @@ class CarParkCSV {
     if (dataList.length == null) {
       throw Exception('Carpark list empty.');
     }
-    print(dataList.length);
     return dataList
         .where((carpark) =>
             geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) <
