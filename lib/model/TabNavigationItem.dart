@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/map.dart';
 import 'package:park_buddy/view/CarparkListView.dart';
+import 'package:park_buddy/view/carpark_info_page.dart';
 
 class TabNavigationItem {
   final Widget page;
@@ -15,7 +16,7 @@ class TabNavigationItem {
 
   static List<TabNavigationItem> get items => [
         TabNavigationItem(
-          page: MapView(),
+          page: CarparkInfoPage("J66"),
           icon: Icon(Icons.map_rounded),
           title: Text("Map View"),
         ),
