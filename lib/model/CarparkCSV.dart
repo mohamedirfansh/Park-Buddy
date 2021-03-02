@@ -1,4 +1,5 @@
 import 'package:csv/csv.dart';
+import 'package:csv/csv_settings_autodetection.dart';
 import 'package:flutter/services.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:park_buddy/model/CarparkInfo.dart';
@@ -10,14 +11,17 @@ class CarParkCSV {
   static List<CarparkInfo> carparkList = List<CarparkInfo>();
 
   static Future<List> loadData() async {
+
     final carparkData = await rootBundle
         .loadString('assets/hdb-carpark-information-latlng.csv', cache: true);
-
     if (carparkData.isEmpty) {
       throw Exception('No csv found');
     }
 
-    final res = const CsvToListConverter().convert(carparkData);
+    //final res = const CsvToListConverter().convert(carparkData);
+    const d = const FirstOccurrenceSettingsDetector(eols: ['\r\n', '\n']);
+    List<List<dynamic>> res = const CsvToListConverter(csvSettingsDetector: d).convert(carparkData);
+
     for (var i = 1; i < res.length; i++) {
       CarparkType carparkType;
       switch (res[i][4]) {
@@ -45,7 +49,7 @@ class CarParkCSV {
       }
 
       CarparkPaymentMethod paymentMethod;
-
+      print("reach3");
       switch (res[i][5]) {
         case 'ELECTRONIC PARKING':
           paymentMethod = CarparkPaymentMethod.electronicParking;
@@ -56,7 +60,6 @@ class CarParkCSV {
       }
 
       ShortTermParkingAvailability shortTermParkingAvailability;
-
       switch (res[i][6]) {
         case 'WHOLE DAY':
           shortTermParkingAvailability = ShortTermParkingAvailability.wholeDay;
@@ -74,7 +77,6 @@ class CarParkCSV {
               ShortTermParkingAvailability.unavailable;
           break;
       }
-
       if (shortTermParkingAvailability == null) {
         throw Exception('Unknown availability found.');
       }
@@ -89,6 +91,7 @@ class CarParkCSV {
       );
       carparkList.add(carparkInfo);
     }
+    int num = carparkList.length;
     return carparkList;
   }
 
@@ -98,6 +101,7 @@ class CarParkCSV {
     if (dataList.length == null) {
       throw Exception('Carpark list empty.');
     }
+    print(dataList.length);
     return dataList
         .where((carpark) =>
             geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) <
