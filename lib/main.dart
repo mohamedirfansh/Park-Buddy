@@ -4,10 +4,11 @@ import 'package:park_buddy/model/CarparkCSV.dart';
 import 'package:park_buddy/route_generator.dart';
 import 'package:park_buddy/view/SearchBar.dart';
 
-void main() {
-  runApp(MyApp());
+void main(){
+  WidgetsFlutterBinding.ensureInitialized();
   //Preload csv data
   CarParkCSV.loadData();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
