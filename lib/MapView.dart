@@ -124,4 +124,19 @@ class _MapViewState extends State<MapView> {
       ),
     ));
   }
+
+  void zoomToLocation(LatLng location) async {
+    final controller = await _controller.future;
+
+    _refreshMarkers(CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
+        0.5, geo.LatLng(location.latitude, location.longitude)));
+
+    await controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        bearing: 0,
+        target: LatLng(location.latitude, location.longitude),
+        zoom: await controller.getZoomLevel(),
+      ),
+    ));
+  }
 }

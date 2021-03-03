@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:park_buddy/map.dart';
+import 'package:park_buddy/MapView.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
