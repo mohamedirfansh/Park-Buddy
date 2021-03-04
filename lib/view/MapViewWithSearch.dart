@@ -64,7 +64,6 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
       );
     }
 
-
   Widget buildFloatingSearchBar() {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return FloatingSearchBar(
@@ -96,43 +95,84 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
         ),
       ],
       builder: (context, transition) {
-        return FutureBuilder(
-          future: apiClient.fetchSuggestions(currentQuery, Localizations.localeOf(context).languageCode),
-          builder: (context, snapshot) {
-            if (currentQuery == '') {
-              return Container(
-                padding: EdgeInsets.all(16.0),
-                child: Center(
-                  child: Text('Start typing to search...'),
-                ),
-                color: Colors.white,
-                constraints: BoxConstraints.expand(
-                    width: 380,
-                    height: 50
-                ),
-              );
-            }
-
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemBuilder: (context, index) =>
-                    ListTile(
-                      title: Text((snapshot.data[index] as Suggestion).description),
-                      onTap: () async {
-                        LatLng location = await apiClient.getPlaceLatLngFromId((snapshot.data[index] as Suggestion).placeId);
-                        print(location);
-                      },
-                      tileColor: Colors.white,
-                    ),
-                itemCount: snapshot.data.length,
-                shrinkWrap: true,
-              );
-            } else {
-              return Container(child: Text('Loading...'));
-            }
-          },
-        );
+        return _autocompleteSuggestionBuilder(context);
       },
+    );
+  }
+
+  FutureBuilder<List<Suggestion>> _autocompleteSuggestionBuilder(BuildContext context) {
+    return FutureBuilder(
+      future: apiClient.fetchSuggestions(currentQuery, Localizations.localeOf(context).languageCode),
+      builder: (context, snapshot) {
+        if (currentQuery == '') {
+          return _preSearchWidget();
+        }
+        if (snapshot.hasData == false) {
+          return _searchLoadingWidget();
+        } else if (snapshot.data.length > 0) {
+          return _suggestionListViewWidget(snapshot);
+        } else {
+          return _emptyResultsWidget();
+        }
+      },
+    );
+  }
+
+  Widget _preSearchWidget() {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      child: Center(
+        child: Text('Start typing to search...'),
+      ),
+      color: Colors.white,
+      constraints: BoxConstraints.expand(
+          width: 380,
+          height: 50
+      ),
+    );
+  }
+
+  Widget _searchLoadingWidget() {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      child: Center(
+        child: Text('Loading...'),
+      ),
+      color: Colors.white,
+      constraints: BoxConstraints.expand(
+          width: 380,
+          height: 50
+      ),
+    );
+  }
+
+  Widget _suggestionListViewWidget(AsyncSnapshot<List<Suggestion>> snapshot) {
+    return ListView.builder(
+      itemBuilder: (context, index) =>
+          ListTile(
+            title: Text(snapshot.data[index].description),
+            onTap: () async {
+              LatLng location = await apiClient.getPlaceLatLngFromId(snapshot.data[index].placeId);
+              print(location);
+            },
+            tileColor: Colors.white,
+          ),
+      itemCount: snapshot.data.length,
+      shrinkWrap: true,
+    );
+  }
+
+  Widget _emptyResultsWidget(){
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      child: Center(
+        child: Text('No results found.'),
+      ),
+      color: Colors.white,
+      constraints: BoxConstraints.expand(
+          width: 380,
+          height: 50
+      ),
     );
   }
 }
