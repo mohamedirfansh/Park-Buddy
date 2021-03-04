@@ -1,32 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:geodesy/geodesy.dart';
+import 'package:geodesy/geodesy.dart' as geo;
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:park_buddy/MapView.dart';
+import 'package:park_buddy/view/MapView.dart';
 import 'package:park_buddy/PlaceService.dart';
 import 'package:uuid/uuid.dart';
 
 class MapViewWithSearch extends StatefulWidget {
+
+
   @override
   _MapViewWithSearchState createState() => _MapViewWithSearchState();
 }
 
 class _MapViewWithSearchState extends State<MapViewWithSearch> {
   final _controller = TextEditingController();
+  final _searchBarController = FloatingSearchBarController();
   _MapViewWithSearchState() {
     this.sessionToken = Uuid().v4();
     apiClient = PlaceApiProvider(sessionToken);
   }
 
+  final GlobalKey<MapViewState> key = new GlobalKey<MapViewState>();
   List<Suggestion> suggestions = List<Suggestion>();
   PlaceApiProvider apiClient;
+
   var sessionToken;
   var currentQuery = '';
-  var mapObject = MapView();
+
 
   @override
   void dispose() {
     _controller.dispose();
+    _searchBarController.dispose();
     super.dispose();
+
   }
 
   @override
@@ -36,33 +43,12 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          mapObject,
+          MapView(key: key),
           buildFloatingSearchBar(),
-          //TODO: default:   search current location
-          //TODO: connect search API with floating search bar
-          //TODO: connect autocomplete to search bar
-          //TODO: default to 'no place found'
         ],
       ),
     );
   }
-  Widget _buildSuggestions() {
-    return ListView.builder(
-        padding: EdgeInsets.all(16.0),
-        itemBuilder: (context, i) {
-          if (i.isOdd) return Divider();
-
-          final index = i ~/ 2;
-          return _buildRow(suggestions[index]);
-        });
-  }
-    Widget _buildRow(Suggestion suggestion) {
-      return ListTile(
-        title: Text(
-          suggestion.description,
-        ),
-      );
-    }
 
   Widget buildFloatingSearchBar() {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
@@ -76,12 +62,15 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
       openAxisAlignment: 0.0,
       maxWidth: isPortrait ? 600 : 500,
       debounceDelay: const Duration(milliseconds: 500),
+      clearQueryOnClose: false,
+      transition: SlideFadeFloatingSearchBarTransition(),
+      controller: _searchBarController,
       onQueryChanged: (query) {
         setState(() {
           currentQuery = query;
         });
       },
-      transition: SlideFadeFloatingSearchBarTransition(),
+
       actions: [
         FloatingSearchBarAction(
           showIfOpened: false,
@@ -152,8 +141,10 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
           ListTile(
             title: Text(snapshot.data[index].description),
             onTap: () async {
-              LatLng location = await apiClient.getPlaceLatLngFromId(snapshot.data[index].placeId);
-              print(location);
+              geo.LatLng location = await apiClient.getPlaceLatLngFromId(snapshot.data[index].placeId);
+              key.currentState.zoomToLocation(location);
+              key.currentState.addMarkerForLocation(snapshot.data[index].description, location);
+              _searchBarController.close();
             },
             tileColor: Colors.white,
           ),
@@ -175,4 +166,5 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
       ),
     );
   }
+
 }
