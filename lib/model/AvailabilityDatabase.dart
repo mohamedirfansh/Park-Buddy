@@ -41,11 +41,16 @@ class AvailabilityDatabase {
       carparkNumber TEXT NOT NULL,
       timestamp INTEGER NOT NULL,
       updateDatetime INTEGER,
-      lotType TEXT,
-      totalLots INTEGER,
-      lotsAvailable INTEGER,
+      singleType INTEGER,
+      totalLotsH INTEGER,
+      totalLotsC INTEGER,
+      totalLotsY INTEGER,
+      lotsAvailableH INTEGER,
+      lotsAvailableC INTEGER,
+      lotsAvailableY INTEGER,
       PRIMARY KEY (carparkNumber, timestamp));""");
   }
+
   /// insert a new CarparkAvailability object into the table
   Future insertCarpark(CarparkAvailability carparkAvailability) async {
     var dbClient = await database;
