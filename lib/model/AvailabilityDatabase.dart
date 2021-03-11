@@ -53,7 +53,7 @@ class AvailabilityDatabase {
     return query;
   }
   /// Note: ID and timestamp must match to update a row.
-  // TODO: better way to query? timestamp must be exact (to the second) to find the carpark.
+  // TODO: better way to query? timestamp must be exact to find the carpark.
   Future<int> updateCarpark(CarparkAvailability carparkAvailability) async {
     var dbClient = await database;
     Map<String, dynamic> row = carparkAvailability.toMap();
@@ -98,5 +98,20 @@ class AvailabilityDatabase {
     results.forEach((result) {
       print(result);
     });
+    int count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $table'));
+    print(count);
   }
+
+  Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
+    final db = await database;
+    final batch = db.batch();
+    /// Batch insert
+    for (var i = 0; i < carparks.length; i++) {
+      if (carparks[i] != null) {
+        batch.insert(table, carparks[i].toMap());
+      }
+    }
+    await batch.commit(noResult: true);
+  }
+
 }
