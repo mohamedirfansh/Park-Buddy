@@ -1,12 +1,13 @@
 import 'dart:collection';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:sqflite/sqflite.dart';
 
 import 'AvailabilityDatabase.dart';
 import 'CarparkAvailability.dart';
 import 'CarparkAPIInterface.dart';
 
 class DatabaseManager {
+  static final table = "AvailabilityTable";
   /*
   static HashSet<String> _duplicateSet = HashSet.from([
     "SK24", "STM2", "U11", "SK34", "SK35", "GBM", "KB1", "SB26", "SB27", "SB28", "S28L", "PM13", "Y48", "Y48M", "SB18", "SB21", "Y12", "Y6", "Y34", "Y34A", "Y36",
@@ -18,19 +19,6 @@ class DatabaseManager {
     "SB12", "SB15", "SB4", "SB7", "SB2", "Y13", "SB10", "Y14", "Y15", "BL8", "BL8L", "MNM", "SK82", "SK84", "TBM2", "H8", "C3M", "ACM", "C24", "C25", "C22M", "GE2"
   ]);
 */
-
-  /**
-      static Future<List<CarparkAvailability>> pullCarparkAvailability() async {
-      var url = "https://api.data.gov.sg/v1/transport/carpark-availability";
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-      final list = json.decode(response.body);
-      final items = list['items'];
-      return _availabilityFromJson(items[0]); //response.data as List
-      } else {
-      throw Exception("Failed to connect to server");
-      }
-   */
   static Future pullCarparkAvailability(DateTime date) async {
     String availJson = await CarparkAPIInterface.getCarparkJson(date);
     final list = json.decode(availJson);
@@ -53,9 +41,79 @@ class DatabaseManager {
     }
     )
     );
-    await AvailabilityDatabase.instance.batchInsertCarparks(carparkList);
+    await batchInsertCarparks(carparkList);
+  }
+  /// insert a new CarparkAvailability object into the table
+  static Future insertCarpark(CarparkAvailability carparkAvailability) async {
+    var dbClient = await AvailabilityDatabase.instance.database;
+    var query = await dbClient.insert(table, carparkAvailability.toMap());
+    return query;
+  }
+  /// Note: ID and timestamp must match to update a row.
+  // TODO: better way to query? timestamp must be exact to find the carpark.
+  static Future<int> updateCarpark(CarparkAvailability carparkAvailability) async {
+    var dbClient = await AvailabilityDatabase.instance.database;
+    Map<String, dynamic> row = carparkAvailability.toMap();
+    var carparkNumber = row['carparkNumber'];
+    var timestamp = row['timestamp'];
+    var query = await dbClient.update(
+        table,
+        row,
+        where: 'carparkNumber = ? AND timestamp = ?', whereArgs: [carparkNumber, timestamp]);
+    return query;
+  }
+
+  /// Delete one carpark's availability information before a given datetime
+  static Future<int> deleteCarparkBefore(String carparkNumber, DateTime timeBefore) async {
+    var dbClient = await AvailabilityDatabase.instance.database;
+    var time = timeBefore.millisecondsSinceEpoch;
+    var query = await dbClient.delete(
+        table,
+        where: 'carparkNumber = ? AND timestamp < ?',
+        whereArgs: [carparkNumber, time]
+    );
+    return query;
+  }
+
+  /// Delete all carpark's availability information before a given datetime
+  static Future<int> deleteAllCarparkBefore(DateTime timeBefore) async {
+    var dbClient = await AvailabilityDatabase.instance.database;
+    var time = timeBefore.millisecondsSinceEpoch;
+    var query = await dbClient.delete(
+        table,
+        where: 'timestamp < ?',
+        whereArgs: [time]
+    );
+    return query;
+  }
+
+  static void getAllCarparks() async {
+    final db = await AvailabilityDatabase.instance.database;
+    List<Map>
+    results = await db.query(table, columns: CarparkAvailability.columns);
+
+    List<CarparkAvailability> list = new List();
+    if (list.length == 0) print("empty");
+    results.forEach((result) {
+      print(result);
+    });
+    int count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $table'));
+    print(count);
+  }
+
+  static Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
+    final db = await AvailabilityDatabase.instance.database;
+    final batch = db.batch();
+    /// Batch insert
+    for (var i = 0; i < carparks.length; i++) {
+      if (carparks[i] != null) {
+        batch.insert(table, carparks[i].toMap());
+      }
+    }
+    await batch.commit(noResult: true);
   }
 }
+
 // query: https://api.data.gov.sg/v1/transport/carpark-availability?date_time=2020-03-05T01%3A40%3A27
 
 // format: {"carpark_info":[{"total_lots":"91","lot_type":"C","lots_available":"33"}],"carpark_number":"HE12","update_datetime":"2021-03-03T22:49:23"}
