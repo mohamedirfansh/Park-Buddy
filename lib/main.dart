@@ -4,7 +4,6 @@ import 'package:park_buddy/model/CarparkCSV.dart';
 import 'package:park_buddy/route_generator.dart';
 import 'package:park_buddy/view/MapViewWithSearch.dart';
 
-import 'model/AvailabilityDatabase.dart';
 import 'model/DatabaseManager.dart';
 
 void main() async{
@@ -12,7 +11,7 @@ void main() async{
   //Preload csv data
   CarParkCSV.loadData();
   runApp(MyApp());
-  final list = await DatabaseManager.pullCarparkAvailability(DateTime.now());
+  await DatabaseManager.pullCarparkAvailability(DateTime.now());
   /*
   print(list.length);
   print(list[2073].carparkNumber);
@@ -22,10 +21,10 @@ void main() async{
   print(list[2073].totalLots);
   print(list[2073].updateDatetime);
   */
-  await AvailabilityDatabase.instance.getAllCarparks();
-  await AvailabilityDatabase.instance.deleteAllCarparkBefore(DateTime.now());
+  await DatabaseManager.getAllCarparks();
+  await DatabaseManager.deleteAllCarparkBefore(DateTime.now());
   print("new query");
-  await AvailabilityDatabase.instance.getAllCarparks();
+  await DatabaseManager.getAllCarparks();
 }
 
 class MyApp extends StatelessWidget {
