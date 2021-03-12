@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:park_buddy/model/DatabaseManager.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'CarparkAvailability.dart';
@@ -11,8 +9,8 @@ class AvailabilityDatabase {
   AvailabilityDatabase._(); // ensure only one copy of database exists
   static final AvailabilityDatabase instance = new AvailabilityDatabase._();
   static final table = "AvailabilityTable";
-
   static Database _database;
+
   /// Lazy initialization method
   Future<Database> get database async {
     if (_database != null) return _database;
@@ -80,6 +78,8 @@ class AvailabilityDatabase {
       where: 'carparkNumber = ? AND timestamp < ?',
       whereArgs: [carparkNumber, time]
     );
+
+    return query;
   }
 
   /// Delete all carpark's availability information before a given datetime
@@ -91,9 +91,11 @@ class AvailabilityDatabase {
         where: 'timestamp < ?',
         whereArgs: [time]
     );
+
+    return query;
   }
 
-  void getAllCarparks() async {
+  void printAllCarparks() async {
     final db = await database;
     List<Map>
     results = await db.query(table, columns: CarparkAvailability.columns);
