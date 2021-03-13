@@ -2,13 +2,21 @@ import 'package:flutter/material.dart';
 
 class CarparkInfoPage extends StatefulWidget {
   @override
-  _CarparkInfoPageState createState() => _CarparkInfoPageState();
+  _CarparkInfoPageState createState() => _CarparkInfoPageState(this.carparkCode);
+  final String carparkCode;
+  CarparkInfoPage(this.carparkCode);
 }
 
 class _CarparkInfoPageState extends State<CarparkInfoPage> {
+  _CarparkInfoPageState(this.carparkCode);
+  final String carparkCode;
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+        child: Center(
+            child: Text(carparkCode)),
+      );
   }
 }
 
