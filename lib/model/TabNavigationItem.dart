@@ -4,7 +4,7 @@ import 'package:park_buddy/view/MapViewWithSearch.dart';
 
 class TabNavigationItem {
   final Widget page;
-  final Widget title;
+  final String title;
   final Icon icon;
 
   TabNavigationItem({
@@ -17,12 +17,12 @@ class TabNavigationItem {
         TabNavigationItem(
           page: MapViewWithSearch(),
           icon: Icon(Icons.map_rounded),
-          title: Text("Map View"),
+          title: "Map View",
         ),
         TabNavigationItem(
           page: CarparkListView(),
           icon: Icon(Icons.list),
-          title: Text("List View"),
+          title: "List View",
         ),
       ];
 }

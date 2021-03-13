@@ -87,7 +87,7 @@ class DatabaseManager {
     return query;
   }
 
-  static void getAllCarparks() async {
+  static void printAllCarparks() async {
     final db = await AvailabilityDatabase.instance.database;
     List<Map>
     results = await db.query(table, columns: CarparkAvailability.columns);

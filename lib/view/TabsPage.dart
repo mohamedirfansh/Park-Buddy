@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/model/TabNavigationItem.dart';
 
-class TabsPage extends StatefulWidget {
+class MultiTabView extends StatefulWidget {
   @override
-  _TabsPageState createState() => _TabsPageState();
+  _MultiTabViewState createState() => _MultiTabViewState();
 }
 
-class _TabsPageState extends State<TabsPage> {
+class _MultiTabViewState extends State<MultiTabView> {
   int _currentIndex = 0;
 
   @override
@@ -25,7 +25,7 @@ class _TabsPageState extends State<TabsPage> {
           for (final tabItem in TabNavigationItem.items)
             BottomNavigationBarItem(
               icon: tabItem.icon,
-              title: tabItem.title,
+              label: tabItem.title,
             )
         ],
       ),

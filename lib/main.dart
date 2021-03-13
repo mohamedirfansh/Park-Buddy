@@ -10,21 +10,13 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   //Preload csv data
   CarParkCSV.loadData();
-  runApp(MyApp());
   await DatabaseManager.pullCarparkAvailability(DateTime.now());
-  /*
-  print(list.length);
-  print(list[2073].carparkNumber);
-  print(list[2073].lotsAvailable);
-  print(list[2073].lotType);
-  print(list[2073].timestamp);
-  print(list[2073].totalLots);
-  print(list[2073].updateDatetime);
-  */
-  await DatabaseManager.getAllCarparks();
+  await DatabaseManager.printAllCarparks();
   await DatabaseManager.deleteAllCarparkBefore(DateTime.now());
-  print("new query");
-  await DatabaseManager.getAllCarparks();
+  await DatabaseManager.printAllCarparks();
+
+  runApp(MyApp());
+
 }
 
 class MyApp extends StatelessWidget {
@@ -34,14 +26,12 @@ class MyApp extends StatelessWidget {
       title: 'ParkBuddy',
       home: Scaffold(
         body: Stack(children: [
-          MapViewWithSearch(),
-          TabsPage(),
+          MultiTabView(),
         ]),
       ),
       theme: ThemeData(
         primaryColor: const Color(0xFF06E2B3),
       ),
-      initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
 //TODO: tutorial
     );

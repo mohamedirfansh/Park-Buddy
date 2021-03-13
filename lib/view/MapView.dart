@@ -64,7 +64,7 @@ class MapViewState extends State<MapView> {
         myLocationEnabled: true,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
-      ),
+        ),
       extendBodyBehindAppBar: true,
 
       //TODO: parking lot list
@@ -72,10 +72,10 @@ class MapViewState extends State<MapView> {
       //           // TODO: onpress/ontap: Navigator.pushNamed(context, '/carparkinfopage', arguments ['HB12']);
 
       floatingActionButton: FloatingActionButton(
-        onPressed: _zoomToCurrentLocation,
-        child: Icon(Icons.location_on),
-        elevation: 2,
-      ),
+          onPressed: _zoomToCurrentLocation,
+          child: Icon(Icons.location_on),
+          elevation: 2,
+        ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
     );
   }
@@ -91,16 +91,19 @@ class MapViewState extends State<MapView> {
           title: carpark.carparkCode,
           snippet:
               '${carpark.address}, ${carpark.carparkPaymentMethod}, ${carpark.carparkType}, ${carpark.shortTermParking}',
-          //TODO: add dynamic carpark info page route
           //TODO: UI for lot availability
           //TODO: backend for querying carpark API (able to query any
-          onTap: () => print('tapped carpark ${carpark.carparkCode}'),
+          onTap: () => _OpenDynamicInfoPage(carpark.carparkCode),
         ),
       );
       markers[carpark.carparkCode] = marker;
     }
 
     return markers;
+  }
+
+  void _OpenDynamicInfoPage(String carparkCode) {
+    Navigator.pushNamed(context, '/carparkinfopage', arguments: carparkCode);
   }
 
   void _zoomToCurrentLocation() async {

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/view/MapView.dart';
+import 'package:park_buddy/view/carpark_info_page.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    //final args = settings.arguments;
+    final args = settings.arguments;
 
     switch (settings.name) {
-      case '/':
-        return MaterialPageRoute(builder: (_) => MapView());
-        break;
       case '/carparkinfopage':
+        var carparkCode = args as String;
+        return  MaterialPageRoute(builder: (_) => CarparkInfoPage(carparkCode));
         break;
       case '/listview':
         break;
