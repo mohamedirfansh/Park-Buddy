@@ -13,13 +13,10 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: carparkCode,
-      child: Container(
+    return Container(
         child: Center(
             child: Text(carparkCode)),
-      ),
-    );
+      );
   }
 }
 
