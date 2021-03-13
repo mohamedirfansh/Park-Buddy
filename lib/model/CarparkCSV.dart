@@ -8,7 +8,7 @@ import 'package:park_buddy/model/CarparkType.dart';
 import 'package:park_buddy/model/ShortTermParkingAvailability.dart';
 
 class CarParkCSV {
-  static List<CarparkInfo> carparkList = List<CarparkInfo>();
+  static List<CarparkInfo> carparkList = [];
 
   static Future<List> loadData() async {
 
@@ -90,7 +90,6 @@ class CarParkCSV {
       );
       carparkList.add(carparkInfo);
     }
-    int num = carparkList.length;
     return carparkList;
   }
 

@@ -2,18 +2,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:park_buddy/MarkerIconGenerator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geodesy/geodesy.dart' as geo;
 import 'package:park_buddy/model/CarparkInfo.dart';
 
-import 'model/CarparkCSV.dart';
+import 'package:park_buddy/model/CarparkCSV.dart';
 
 class MapView extends StatefulWidget {
+  MapView({Key key}) : super(key: key);
   @override
-  _MapViewState createState() => _MapViewState();
+  MapViewState createState() => MapViewState();
 }
 
-class _MapViewState extends State<MapView> {
+class MapViewState extends State<MapView> {
   final Completer<GoogleMapController> _controller = Completer();
 
   static final CameraPosition _singapore = CameraPosition(
@@ -32,7 +34,6 @@ class _MapViewState extends State<MapView> {
   void _refreshMarkers(List<CarparkInfo> list) {
     setState(() {
       _markers.clear();
-      //TODO: make distance calculator and filter method for carpark list, current display too overloaded/slow (filter for 5km)
       _fillDataToMarkers(_markers, list);
     });
   }
@@ -63,7 +64,7 @@ class _MapViewState extends State<MapView> {
         myLocationEnabled: true,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
-      ),
+        ),
       extendBodyBehindAppBar: true,
 
       //TODO: parking lot list
@@ -71,10 +72,10 @@ class _MapViewState extends State<MapView> {
       //           // TODO: onpress/ontap: Navigator.pushNamed(context, '/carparkinfopage', arguments ['HB12']);
 
       floatingActionButton: FloatingActionButton(
-        onPressed: _zoomToCurrentLocation,
-        child: Icon(Icons.location_on),
-        elevation: 2,
-      ),
+          onPressed: _zoomToCurrentLocation,
+          child: Icon(Icons.location_on),
+          elevation: 2,
+        ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
     );
   }
@@ -90,11 +91,9 @@ class _MapViewState extends State<MapView> {
           title: carpark.carparkCode,
           snippet:
               '${carpark.address}, ${carpark.carparkPaymentMethod}, ${carpark.carparkType}, ${carpark.shortTermParking}',
-          //TODO: add dynamic carpark info page route
-          //TODO: histogram
           //TODO: UI for lot availability
           //TODO: backend for querying carpark API (able to query any
-          onTap: () => print('tapped carpark ${carpark.carparkCode}'),
+          onTap: () => _OpenDynamicInfoPage(carpark.carparkCode),
         ),
       );
       markers[carpark.carparkCode] = marker;
@@ -103,8 +102,11 @@ class _MapViewState extends State<MapView> {
     return markers;
   }
 
-  void _zoomToCurrentLocation() async {
-    final controller = await _controller.future;
+  void _OpenDynamicInfoPage(String carparkCode) async {
+    Navigator.pushNamed(context, '/carparkinfopage', arguments: [carparkCode, await _getCurrentLocation()]);
+  }
+
+  Future<LocationData> _getCurrentLocation() async {
     LocationData currentLocation;
     var location = Location();
     try {
@@ -113,6 +115,13 @@ class _MapViewState extends State<MapView> {
       currentLocation = null;
     }
 
+    return currentLocation;
+  }
+
+  void _zoomToCurrentLocation() async {
+    final controller = await _controller.future;
+
+    var currentLocation = await _getCurrentLocation();
     _refreshMarkers(CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
         0.5, geo.LatLng(currentLocation.latitude, currentLocation.longitude)));
 
@@ -123,5 +132,36 @@ class _MapViewState extends State<MapView> {
         zoom: await controller.getZoomLevel(),
       ),
     ));
+  }
+
+  void zoomToLocation(geo.LatLng location) async {
+    final controller = await _controller.future;
+
+    _refreshMarkers(CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
+        0.5, geo.LatLng(location.latitude, location.longitude)));
+
+    await controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        bearing: 0,
+        target: LatLng(location.latitude, location.longitude),
+        zoom: 15, //15 displays all carparks in 500m radius. //TODO: to change this default value if we add radius slider
+      ),
+    ));
+  }
+
+  void addMarkerForLocation(String locationDetails, geo.LatLng location) async {
+    final controller = await _controller.future;
+    MarkerGenerator markerGen = MarkerGenerator(120);
+    final marker = Marker(
+      icon: await markerGen.createBitmapDescriptorFromIconData(Icons.location_history, Colors.blue, Colors.black, Colors.white),
+      markerId: MarkerId(locationDetails),
+      position: LatLng(location.latitude, location.longitude),
+        onTap: () async {
+          print(await controller.getZoomLevel());
+        }
+      );
+    setState(() {
+      _markers["new"] = marker;
+    });
   }
 }
