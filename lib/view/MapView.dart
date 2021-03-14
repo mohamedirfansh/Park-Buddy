@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
-import 'package:park_buddy/MarkerIconGenerator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:location/location.dart';
 import 'package:geodesy/geodesy.dart' as geo;
-import 'package:park_buddy/model/CarparkInfo.dart';
 
+import 'package:park_buddy/MarkerIconGenerator.dart';
+import 'package:park_buddy/model/CarparkInfo.dart';
 import 'package:park_buddy/model/CarparkCSV.dart';
 
 class MapView extends StatefulWidget {
@@ -64,7 +64,7 @@ class MapViewState extends State<MapView> {
         myLocationEnabled: true,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
-        ),
+      ),
       extendBodyBehindAppBar: true,
 
       //TODO: parking lot list
@@ -72,11 +72,12 @@ class MapViewState extends State<MapView> {
       //           // TODO: onpress/ontap: Navigator.pushNamed(context, '/carparkinfopage', arguments ['HB12']);
 
       floatingActionButton: FloatingActionButton(
-          onPressed: _zoomToCurrentLocation,
-          child: Icon(Icons.location_on),
-          elevation: 2,
-        ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
+        onPressed: _zoomToCurrentLocation,
+        child: Icon(Icons.location_on),
+        elevation: 2,
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterFloat,
     );
   }
 
@@ -138,7 +139,8 @@ class MapViewState extends State<MapView> {
       CameraPosition(
         bearing: 0,
         target: LatLng(location.latitude, location.longitude),
-        zoom: 15, //15 displays all carparks in 500m radius. //TODO: to change this default value if we add radius slider
+        zoom:
+            15, //15 displays all carparks in 500m radius. //TODO: to change this default value if we add radius slider
       ),
     ));
   }
@@ -147,13 +149,13 @@ class MapViewState extends State<MapView> {
     final controller = await _controller.future;
     MarkerGenerator markerGen = MarkerGenerator(120);
     final marker = Marker(
-      icon: await markerGen.createBitmapDescriptorFromIconData(Icons.location_history, Colors.blue, Colors.black, Colors.white),
-      markerId: MarkerId(locationDetails),
-      position: LatLng(location.latitude, location.longitude),
+        icon: await markerGen.createBitmapDescriptorFromIconData(
+            Icons.location_history, Colors.blue, Colors.black, Colors.white),
+        markerId: MarkerId(locationDetails),
+        position: LatLng(location.latitude, location.longitude),
         onTap: () async {
           print(await controller.getZoomLevel());
-        }
-      );
+        });
     setState(() {
       _markers["new"] = marker;
     });
