@@ -7,13 +7,16 @@ import 'package:park_buddy/view/MapViewWithSearch.dart';
 import 'model/DatabaseManager.dart';
 
 void main() async{
+
+
+
   WidgetsFlutterBinding.ensureInitialized();
   //Preload csv data
-  CarParkCSV.loadData();
+  await CarParkCSV.loadData();
   await DatabaseManager.pullCarparkAvailability(DateTime.now());
-  DatabaseManager.printAllCarparks();
+  // DatabaseManager.printAllCarparks();
   await DatabaseManager.deleteAllCarparkBefore(DateTime.now());
-  DatabaseManager.printAllCarparks();
+  // DatabaseManager.printAllCarparks();
 
   runApp(MyApp());
 

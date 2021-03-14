@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:geodesy/geodesy.dart';
 import 'package:location/location.dart';
+import 'package:park_buddy/model/CarparkAPIInterface.dart';
+import 'package:park_buddy/model/CarparkAvailability.dart';
 import 'package:park_buddy/model/CarparkCSV.dart';
 import 'package:park_buddy/model/CarparkInfo.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:park_buddy/Histogram.dart';
+import 'package:park_buddy/model/DatabaseManager.dart';
 
 
 class CarparkInfoPage extends StatefulWidget {
@@ -31,10 +33,9 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
   Widget build(BuildContext context) {
     CarparkInfo carpark = CarParkCSV.carparkList.where((carpark) =>
     carpark.carparkCode == widget.carparkCode).elementAt(0);
-     // TODO: remove once destination select is working
     return Scaffold(
       appBar: AppBar(
-        title: Text('Carpark ${widget.carparkCode}'),
+        title: Text(carpark.address),
         backgroundColor: Colors.white,
       ),
       body: Container(
@@ -50,7 +51,7 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
               child: Column(
                 children: [
                   _titleSection(carpark),
-                  _infoSection(carpark),
+                  _carparkInfoSectionBuilder(context, carpark),
                 ],
               ),
             ),
@@ -77,6 +78,7 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
       ),
     );
   }
+
   Widget _titleSection(CarparkInfo carpark) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -105,15 +107,14 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
     );
   }
 
-  Widget _infoSection(CarparkInfo carpark) {
+  Widget _carparkAvailabilityInfoSection(CarparkInfo carpark, CarparkAvailability carparkAvailability) {
     return Container(
         padding: const EdgeInsets.all(20),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                  "95/100 lots",
-                  //TODO: get carpark availability info dynamically
+                  "${carparkAvailability.lotsAvailableC}/${carparkAvailability.totalLotsC} lots available",
                   style: TextStyle(
                       fontSize: 15
                   )
@@ -121,11 +122,72 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
               Text(
                   "${getDistance(
                       carpark.latlng.latitude, carpark.latlng.longitude)
-                      .toStringAsFixed(1)} km", // format to 1 decimal place
+                      .toStringAsFixed(1)} km away", // format to 1 decimal place
                   style: TextStyle(
                       fontSize: 15
                   )
               )
+            ]
+        )
+    );
+  }
+
+  FutureBuilder<CarparkAvailability> _carparkInfoSectionBuilder(BuildContext context, CarparkInfo carpark) {
+    return FutureBuilder(
+      future: _getCarparkAvailability(carpark),
+      builder: (context, snapshot) {
+        if (snapshot.hasData == false && !snapshot.hasError) {
+          return _apiLoadingWidget(carpark);
+        } else if (snapshot.hasData) {
+          return _carparkAvailabilityInfoSection(carpark, snapshot.data);
+        } else {
+          return _emptyResultsWidget();
+        }
+      },
+    );
+  }
+
+  Future<CarparkAvailability> _getCarparkAvailability(CarparkInfo carpark) async {
+    return await CarparkAPIInterface.getSingleCarparkAvailability(DateTime.now(), carpark);
+  }
+
+  Widget _apiLoadingWidget(CarparkInfo carpark) {
+    return Container(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                  "Loading data...",
+                  style: TextStyle(
+                      fontSize: 15
+                  )
+              ),
+              Text(
+                  "${getDistance(
+                      carpark.latlng.latitude, carpark.latlng.longitude)
+                      .toStringAsFixed(1)} km away", // format to 1 decimal place
+                  style: TextStyle(
+                      fontSize: 15
+                  )
+              )
+            ]
+        )
+    );
+  }
+
+  Widget _emptyResultsWidget(){
+    return Container(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                  "API unavailable. Please try again later.",
+                  style: TextStyle(
+                      fontSize: 15
+                  )
+              ),
             ]
         )
     );

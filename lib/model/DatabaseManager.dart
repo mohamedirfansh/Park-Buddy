@@ -20,14 +20,17 @@ class DatabaseManager {
   ]);
 */
   static Future pullCarparkAvailability(DateTime date) async {
-    String availJson = await CarparkAPIInterface.getCarparkJson(date);
-    final list = json.decode(availJson);
-    final items = list['items'];
-    return await _availabilityFromJson(items[0]);
+    final items = await CarparkAPIInterface.getCarparkMap(date);
+    await _availabilityFromJson(items);
   }
 
   /// private method to convert retrieved carpark availability json into CarparkAvailability object
-  static Future<List<CarparkAvailability>> _availabilityFromJson(Map<String, dynamic> items) async {
+  static Future _availabilityFromJson(Map<String, dynamic> items) async {
+    var carparkList = createCarparkAvailabilityListFromMap(items);
+    await batchInsertCarparks(carparkList);
+  }
+
+  static List<CarparkAvailability> createCarparkAvailabilityListFromMap(Map<String, dynamic> items){
     HashSet<String> duplicateSet = new HashSet<String>();
     var timestamp = items["timestamp"];
     var carparkData = items["carpark_data"];
@@ -38,10 +41,8 @@ class DatabaseManager {
         duplicateSet.add(item.carparkNumber);
         return item;
       }
-    }
-    )
-    );
-    await batchInsertCarparks(carparkList);
+    }));
+    return carparkList;
   }
   /// insert a new CarparkAvailability object into the table
   static Future insertCarpark(CarparkAvailability carparkAvailability) async {

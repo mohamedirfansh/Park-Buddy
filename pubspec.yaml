@@ -63,8 +63,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - hdb-carpark-information.csv
-    - hdb-carpark-information-latlng.csv
+  #this fixed list removes carparks not contained in the API data and converts the coordinates to LatLng
+    - hdb-carpark-information-latlng-fixed.csv
     - assets/images/
 
   # To add assets to your application, add an assets section, like this:

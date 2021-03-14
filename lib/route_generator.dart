@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/view/MapView.dart';
-import 'package:park_buddy/view/carpark_info_page.dart';
+import 'package:park_buddy/view/CarparkInfoPage.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {

@@ -21,10 +21,3 @@ class CarparkInfo {
   final CarparkPaymentMethod carparkPaymentMethod;
   final ShortTermParkingAvailability shortTermParking;
 }
-
-class CarparkAvailabilityInfo {
-  CarparkAvailabilityInfo(this.carparkCode, this.totalLots, this.availableLots);
-  final String carparkCode;
-  final num totalLots;
-  num availableLots;
-}

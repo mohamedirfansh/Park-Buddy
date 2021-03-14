@@ -2,10 +2,14 @@ import 'package:csv/csv.dart';
 import 'package:csv/csv_settings_autodetection.dart';
 import 'package:flutter/services.dart';
 import 'package:geodesy/geodesy.dart';
+import 'package:park_buddy/model/CarparkAPIInterface.dart';
 import 'package:park_buddy/model/CarparkInfo.dart';
 import 'package:park_buddy/model/CarparkPaymentMethod.dart';
 import 'package:park_buddy/model/CarparkType.dart';
+import 'package:park_buddy/model/DatabaseManager.dart';
 import 'package:park_buddy/model/ShortTermParkingAvailability.dart';
+
+import 'CarparkAvailability.dart';
 
 class CarParkCSV {
   static List<CarparkInfo> carparkList = [];
@@ -13,7 +17,7 @@ class CarParkCSV {
   static Future<List> loadData() async {
 
     final carparkData = await rootBundle
-        .loadString('assets/hdb-carpark-information-latlng.csv', cache: true);
+        .loadString('assets/hdb-carpark-information-latlng-fixed.csv', cache: true);
     if (carparkData.isEmpty) {
       throw Exception('No csv found');
     }
@@ -90,8 +94,48 @@ class CarParkCSV {
       );
       carparkList.add(carparkInfo);
     }
+
+    //This code was used to figure out which carpark in our CSV data was not available in the API. Subsequently fixed in assets/hdb-carpark-information-latlng-fixed.csv.
+
+    // var items = await CarparkAPIInterface.getCarparkMap(DateTime.now());
+    // Set<String> duplicateSet = new Set<String>();
+    // var carparkString = items["carpark_data"];
+    // List<String> duplicateList = [];
+    // for(var i=0; i< carparkString.length; i++){
+    //   if (!duplicateSet.contains(carparkString[i]['carpark_number'])) {
+    //     duplicateSet.add(carparkString[i]['carpark_number']);
+    //   } else {
+    //     duplicateList.add(carparkString[i]['carpark_number']);
+    //   }
+    // }
+    //
+    //
+    // print('duplicate list: $duplicateList');
+    // var APIunavailableList = [];
+    //
+    // for (var i=0;i < carparkList.length; i++){
+    //   if(!duplicateSet.contains(carparkList[i].carparkCode)){
+    //     APIunavailableList.add(carparkList[i].carparkCode);
+    //   }
+    // }
+    //
+    // for (var i=0;i < APIunavailableList.length; i++){
+    //   print(APIunavailableList[i]);
+    // }
+
+    // print(APIunavailableList.length);
+
+
     return carparkList;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CarParkCSV && runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
 
   static List<CarparkInfo> dataFilteredByDistance(
       List<CarparkInfo> dataList, num limitInKM, LatLng currentPos) {
