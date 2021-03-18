@@ -5,43 +5,46 @@ import 'package:sqflite/sqflite.dart';
 import 'AvailabilityDatabase.dart';
 import 'CarparkAvailability.dart';
 import 'CarparkAPIInterface.dart';
+import 'PullDateManager.dart';
 
 class DatabaseManager {
   static final table = "AvailabilityTable";
-  /*
-  static HashSet<String> _duplicateSet = HashSet.from([
-    "SK24", "STM2", "U11", "SK34", "SK35", "GBM", "KB1", "SB26", "SB27", "SB28", "S28L", "PM13", "Y48", "Y48M", "SB18", "SB21", "Y12", "Y6", "Y34", "Y34A", "Y36",
-    "Y40", "Y43", "MPS", "Y10", "Y11", "Y16", "Y18", "Y19", "Y20", "Y21", "Y21M", "Y26", "Y27", "Y28", "Y28M", "Y29", "Y3", "Y33", "Y39", "Y3M", "Y4", "Y41", "Y41M",
-    "Y49", "Y49L", "Y49M", "Y5", "Y52M", "Y57", "Y58", "Y62M", "Y63M", "Y64M", "Y65M", "Y66M", "Y68L", "Y68M", "Y7", "Y9", "Y17", "Y31", "Y32", "Y8", "PM41", "PM38",
-    "PM35", "PM43", "PM44", "CV1", "CV2", "CV3", "P40L", "PM10", "PM11", "PM12", "PM14", "PM16", "PM17", "PM18", "PM19", "PM20", "PM23", "PM24", "PM25", "PM29", "PM3",
-    "PM30", "PM32", "PM33", "PM34", "PM36", "PM37", "PM40", "PM45", "PM6", "PM7", "PM8", "PR1", "PR10", "PR13", "PR14", "PR2", "PR4", "PR7", "PR8", "PM26", "PM46", "S19L", "S24L",
-    "SB1", "SB13", "SB16", "SB19", "SB22", "SB23", "SB24", "SB29", "SB3", "SB34", "SB5", "SB6", "SB8", "SB9", "SB30", "SB31", "SB33", "SB11", "S15L",
-    "SB12", "SB15", "SB4", "SB7", "SB2", "Y13", "SB10", "Y14", "Y15", "BL8", "BL8L", "MNM", "SK82", "SK84", "TBM2", "H8", "C3M", "ACM", "C24", "C25", "C22M", "GE2"
-  ]);
-*/
-  static Future pullCarparkAvailability(DateTime date) async {
+
+  /// Pull Carpark Availability API an convert into CarparkAvailability objects.
+  static Future<List<Map>> pullCarparkAvailability(DateTime date, {bool insertIntoDatabase=false}) async {
     String availJson = await CarparkAPIInterface.getCarparkJson(date);
     final list = json.decode(availJson);
     final items = list['items'];
-    return await _availabilityFromJson(items[0]);
+    return await _availabilityFromJson(items[0], insertIntoDatabase);
   }
 
   /// private method to convert retrieved carpark availability json into CarparkAvailability object
-  static Future<List<CarparkAvailability>> _availabilityFromJson(Map<String, dynamic> items) async {
-    HashSet<String> duplicateSet = new HashSet<String>();
+  static Future<List<Map>> _availabilityFromJson(Map<String, dynamic> items, bool insertIntoDatabase) async {
+    Map<String, int> duplicateSet = new HashMap<String, int>();
     var timestamp = items["timestamp"];
     var carparkData = items["carpark_data"];
 
-    var carparkList = List<CarparkAvailability>.from(carparkData.map((x) {
+    var carparkList = List<CarparkAvailability>();
+    List returnList = List<Map<String, dynamic>>();
+    for (var x in carparkData) {
       CarparkAvailability item = CarparkAvailability.fromJson(x, timestamp);
-      if (!duplicateSet.contains(item.carparkNumber)) {
-        duplicateSet.add(item.carparkNumber);
-        return item;
+      if (!duplicateSet.containsKey(item.carparkNumber)) {
+        duplicateSet[item.carparkNumber] = item.updateDatetime;
+        carparkList.add(item);
+      } else {
+        if (item.updateDatetime > duplicateSet[item.carparkNumber]) {
+          carparkList.removeWhere((c) => c.carparkNumber == item.carparkNumber); // remove the older carparkavailability
+          carparkList.add(item);
+          duplicateSet[item.carparkNumber] = item.updateDatetime; // update duplicateSet
+        }
       }
     }
-    )
-    );
-    await batchInsertCarparks(carparkList);
+    if (insertIntoDatabase)
+      await batchInsertCarparks(carparkList);
+    else {
+      carparkList.forEach((x) => returnList.add(x.toMap()));
+      return returnList;
+    }
   }
   /// insert a new CarparkAvailability object into the table
   static Future insertCarpark(CarparkAvailability carparkAvailability) async {
@@ -60,6 +63,18 @@ class DatabaseManager {
         table,
         row,
         where: 'carparkNumber = ? AND timestamp = ?', whereArgs: [carparkNumber, timestamp]);
+    return query;
+  }
+
+  /// Delete a specific carpark availability record
+  static Future<int> deleteCarpark(String carparkNumber, DateTime timestamp) async {
+    var dbClient = await AvailabilityDatabase.instance.database;
+    var time = timestamp.millisecondsSinceEpoch;
+    var query = await dbClient.delete(
+        table,
+        where: 'carparkNumber = ? AND timestamp = ?',
+        whereArgs: [carparkNumber, time]
+    );
     return query;
   }
 
@@ -84,26 +99,37 @@ class DatabaseManager {
         where: 'timestamp < ?',
         whereArgs: [time]
     );
+    PullDateManager.saveDate(0); // reset last pull date if deletion from database is done.
     return query;
   }
 
-  static void printAllCarparks() async {
-    final db = await AvailabilityDatabase.instance.database;
-    List<Map>
-    results = await db.query(table, columns: CarparkAvailability.columns);
+  // Return a list of all Carparks, sorted by date
+  static Future<List<Map>> getCarparkList(String carparkNumber) async {
+    final dbClient = await AvailabilityDatabase.instance.database;
+    List<Map> results = await dbClient.query(
+        table,
+        columns: CarparkAvailability.columns,
+        where: 'carparkNumber = ?',
+        whereArgs: [carparkNumber],
+        orderBy: 'timestamp ASC',
+    );
+    return results;
+  }
 
-    List<CarparkAvailability> list = new List();
-    if (list.length == 0) print("empty");
+  static void printAllCarparks() async {
+    final dbClient = await AvailabilityDatabase.instance.database;
+    List<Map> results = await dbClient.query(table, columns: CarparkAvailability.columns);
+
     results.forEach((result) {
       print(result);
     });
-    int count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $table'));
-    print(count);
+    int count = Sqflite.firstIntValue(await dbClient.rawQuery('SELECT COUNT(*) FROM $table'));
+    (count > 0) ? print(count) : print("empty");
   }
 
   static Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
-    final db = await AvailabilityDatabase.instance.database;
-    final batch = db.batch();
+    final dbClient = await AvailabilityDatabase.instance.database;
+    final batch = dbClient.batch();
     /// Batch insert
     for (var i = 0; i < carparks.length; i++) {
       if (carparks[i] != null) {
@@ -111,6 +137,15 @@ class DatabaseManager {
       }
     }
     await batch.commit(noResult: true);
+  }
+
+  static Future checkWindow(DateTime start, DateTime end) async{
+    int startEpoch = start.millisecondsSinceEpoch;
+    int endEpoch = end.millisecondsSinceEpoch;
+    final dbClient = await AvailabilityDatabase.instance.database;
+
+    var count = await dbClient.rawQuery('SELECT COUNT(*) FROM $table WHERE timestamp >= $startEpoch AND timestamp <= $endEpoch');
+    print(Sqflite.firstIntValue(count));
   }
 }
 
