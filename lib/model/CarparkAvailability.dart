@@ -11,7 +11,8 @@ class CarparkAvailability {
   String carparkNumber;
   int updateDatetime;
   int timestamp;
-  static final columns = ["carparkNumber",
+
+  static final columns = ['carparkNumber',
     'timestamp',
     'updateDatetime',
     'singleType',
@@ -28,7 +29,6 @@ class CarparkAvailability {
     this.totalLotsH,
     this.totalLotsC,
     this.totalLotsY,
-    //this.lotType,
     this.lotsAvailableH,
     this.lotsAvailableC,
     this.lotsAvailableY,
@@ -37,10 +37,11 @@ class CarparkAvailability {
   });
   /// factory method to parse from json map
   factory CarparkAvailability.fromJson(Map<String, dynamic> json, String timestamp) {
-    final dateFormat = DateFormat('yyyy-MM-ddThh:mm:ss');
+    final dateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
+    DateTime date = dateFormat.parse(timestamp);
     int totalH=0, totalC=0, totalY=0;
     int availH=0, availC=0, availY=0;
-    //var carparkInfo = json["carpark_info"][0];
+
     int numCarparkTypes = json["carpark_info"].length;
     for (int i=0; i<json["carpark_info"].length; i++) {
       var currentLotInfo = json["carpark_info"][i];
@@ -61,7 +62,7 @@ class CarparkAvailability {
       }
     }
     return CarparkAvailability(
-      timestamp: dateFormat.parse(timestamp).millisecondsSinceEpoch,
+      timestamp: date.millisecondsSinceEpoch,
       carparkNumber: json["carpark_number"],
       singleType: (numCarparkTypes == 1) ? 1 : 0,
       totalLotsH: totalH,
