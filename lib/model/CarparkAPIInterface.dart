@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class CarparkAPIInterface {
-  static final dateFormat = DateFormat('yyyy-MM-ddThh%3Amm%3Ass');
+  static final dateFormat = DateFormat('yyyy-MM-ddTHH%3Amm%3Ass');
 
   /// Pull HDB carpark availability data for a specified date and time
   static Future<String> getCarparkJson(DateTime dateTime) async{
