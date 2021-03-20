@@ -160,9 +160,7 @@ class MapViewState extends State<MapView> {
             Icons.location_history, Colors.blue, Colors.black, Colors.white),
         markerId: MarkerId(locationDetails),
         position: LatLng(location.latitude, location.longitude),
-        onTap: () async {
-          print(await controller.getZoomLevel());
-        });
+    );
     setState(() {
       _markers["new"] = marker;
     });
