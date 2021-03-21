@@ -4,7 +4,7 @@ import 'DatabaseManager.dart';
 
 /// Handles the logic to pull dates that are missing from the database and delete dates that are outside the window.
 class PullDateManager {
-  /// Pull window - the previous x hours
+  /// Defines the timeframe that we maintain the historical data for. (i.e. pullWindow = 24; historical data for the past 24 hours will be maintained.)
   static final int pullWindow = 1*24; // 1 day
 
   static Future<int> getDate() async {

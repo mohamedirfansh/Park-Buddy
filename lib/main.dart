@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:park_buddy/model/CarparkCSV.dart';
+import 'package:park_buddy/control/CarparkCSV.dart';
 import 'package:park_buddy/route_generator.dart';
 
-import 'package:park_buddy/view/OnBoardingPage.dart';
-import 'package:park_buddy/view/TabsPage.dart';
-import 'package:park_buddy/view/MapViewWithSearch.dart';
+import 'package:park_buddy/boundary/OnBoardingPage.dart';
+import 'package:park_buddy/boundary/TabsPage.dart';
+import 'package:park_buddy/boundary/MapViewWithSearch.dart';
 
-import 'model/DatabaseManager.dart';
+import 'control/DatabaseManager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
