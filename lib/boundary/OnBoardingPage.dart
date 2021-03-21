@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'package:park_buddy/view/TabsPage.dart';
+import 'package:park_buddy/boundary/TabsPage.dart';
 
 class OnBoardingPage extends StatelessWidget {
   @override

@@ -2,10 +2,10 @@ import 'package:csv/csv.dart';
 import 'package:csv/csv_settings_autodetection.dart';
 import 'package:flutter/services.dart';
 import 'package:geodesy/geodesy.dart';
-import 'package:park_buddy/model/CarparkInfo.dart';
-import 'package:park_buddy/model/CarparkPaymentMethod.dart';
-import 'package:park_buddy/model/CarparkType.dart';
-import 'package:park_buddy/model/ShortTermParkingAvailability.dart';
+import 'package:park_buddy/entity/CarparkInfo.dart';
+import 'package:park_buddy/entity/CarparkPaymentMethod.dart';
+import 'package:park_buddy/entity/CarparkType.dart';
+import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 
 class CarParkCSV {
   static List<CarparkInfo> carparkList = List<CarparkInfo>();
@@ -90,7 +90,6 @@ class CarParkCSV {
       );
       carparkList.add(carparkInfo);
     }
-    int num = carparkList.length;
     return carparkList;
   }
 
