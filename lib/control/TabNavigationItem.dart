@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/boundary/CarparkListView.dart';
-import 'package:park_buddy/boundary/MapViewWithSearch.dart';
+import 'file:///C:/Users/garfi/Documents/Android/Park-Buddy-refact/lib/control/MapViewWithSearch.dart';
 
 class TabNavigationItem {
   final Widget page;
