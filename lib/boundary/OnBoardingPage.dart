@@ -40,9 +40,8 @@ class OnBoardingPage extends StatelessWidget {
         ),
       );
 
-  void goToHome(context) => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => MultiTabView()),
-      );
+  void goToHome(context) => Navigator.pushNamed(context, '/multitabview');
+
 
   PageDecoration getPageDecoration() => PageDecoration(
         titleTextStyle: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
