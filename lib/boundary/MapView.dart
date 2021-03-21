@@ -5,7 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:location/location.dart';
 import 'package:geodesy/geodesy.dart' as geo;
 
-import 'package:park_buddy/MarkerIconGenerator.dart';
+import 'package:park_buddy/control/MarkerIconGenerator.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 import 'package:park_buddy/control/CarparkCSV.dart';
 

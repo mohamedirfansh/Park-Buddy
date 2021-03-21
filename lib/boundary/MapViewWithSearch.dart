@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart' as geo;
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:park_buddy/boundary/MapView.dart';
-import 'package:park_buddy/PlaceService.dart';
 import 'package:uuid/uuid.dart';
+import 'PlaceService.dart';
 
 class MapViewWithSearch extends StatefulWidget {
 

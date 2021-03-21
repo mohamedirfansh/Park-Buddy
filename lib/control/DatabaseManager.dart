@@ -1,14 +1,14 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
+import 'package:park_buddy/entity/AvailabilityDatabase.dart';
+import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../entity/AvailabilityDatabase.dart';
-import '../entity/CarparkAvailability.dart';
-import 'CarparkAPIInterface.dart';
 import 'PullDateManager.dart';
 
 class DatabaseManager {
-  static final table = "AvailabilityTable";
+  static final _table = "AvailabilityTable";
 
   /// Pull Carpark Availability API an convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date, {bool insertIntoDatabase=false}) async {
@@ -49,7 +49,7 @@ class DatabaseManager {
   /// insert a new CarparkAvailability object into the table
   static Future insertCarpark(CarparkAvailability carparkAvailability) async {
     var dbClient = await AvailabilityDatabase.instance.database;
-    var query = await dbClient.insert(table, carparkAvailability.toMap());
+    var query = await dbClient.insert(_table, carparkAvailability.toMap());
     return query;
   }
   /// Note: ID and timestamp must match to update a row.
@@ -60,7 +60,7 @@ class DatabaseManager {
     var carparkNumber = row['carparkNumber'];
     var timestamp = row['timestamp'];
     var query = await dbClient.update(
-        table,
+        _table,
         row,
         where: 'carparkNumber = ? AND timestamp = ?', whereArgs: [carparkNumber, timestamp]);
     return query;
@@ -71,7 +71,7 @@ class DatabaseManager {
     var dbClient = await AvailabilityDatabase.instance.database;
     var time = timestamp.millisecondsSinceEpoch;
     var query = await dbClient.delete(
-        table,
+        _table,
         where: 'carparkNumber = ? AND timestamp = ?',
         whereArgs: [carparkNumber, time]
     );
@@ -83,7 +83,7 @@ class DatabaseManager {
     var dbClient = await AvailabilityDatabase.instance.database;
     var time = timeBefore.millisecondsSinceEpoch;
     var query = await dbClient.delete(
-        table,
+        _table,
         where: 'carparkNumber = ? AND timestamp < ?',
         whereArgs: [carparkNumber, time]
     );
@@ -95,7 +95,7 @@ class DatabaseManager {
     var dbClient = await AvailabilityDatabase.instance.database;
     var time = timeBefore.millisecondsSinceEpoch;
     var query = await dbClient.delete(
-        table,
+        _table,
         where: 'timestamp < ?',
         whereArgs: [time]
     );
@@ -107,7 +107,7 @@ class DatabaseManager {
   static Future<List<Map>> getCarparkList(String carparkNumber) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     List<Map> results = await dbClient.query(
-        table,
+        _table,
         columns: CarparkAvailability.columns,
         where: 'carparkNumber = ?',
         whereArgs: [carparkNumber],
@@ -118,12 +118,12 @@ class DatabaseManager {
 
   static void printAllCarparks() async {
     final dbClient = await AvailabilityDatabase.instance.database;
-    List<Map> results = await dbClient.query(table, columns: CarparkAvailability.columns);
+    List<Map> results = await dbClient.query(_table, columns: CarparkAvailability.columns);
 
     results.forEach((result) {
       print(result);
     });
-    int count = Sqflite.firstIntValue(await dbClient.rawQuery('SELECT COUNT(*) FROM $table'));
+    int count = Sqflite.firstIntValue(await dbClient.rawQuery('SELECT COUNT(*) FROM $_table'));
     (count > 0) ? print(count) : print("empty");
   }
 
@@ -133,7 +133,7 @@ class DatabaseManager {
     /// Batch insert
     for (var i = 0; i < carparks.length; i++) {
       if (carparks[i] != null) {
-        batch.insert(table, carparks[i].toMap());
+        batch.insert(_table, carparks[i].toMap());
       }
     }
     await batch.commit(noResult: true);
@@ -144,7 +144,7 @@ class DatabaseManager {
     int endEpoch = end.millisecondsSinceEpoch;
     final dbClient = await AvailabilityDatabase.instance.database;
 
-    var count = await dbClient.rawQuery('SELECT COUNT(*) FROM $table WHERE timestamp >= $startEpoch AND timestamp <= $endEpoch');
+    var count = await dbClient.rawQuery('SELECT COUNT(*) FROM $_table WHERE timestamp >= $startEpoch AND timestamp <= $endEpoch');
     print(Sqflite.firstIntValue(count));
   }
 }
