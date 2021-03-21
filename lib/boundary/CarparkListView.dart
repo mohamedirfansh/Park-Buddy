@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:park_buddy/control/CarparkCSV.dart';
 
-import 'CarparkCard.dart';
+import 'package:park_buddy/entity/CarparkCard.dart';
 
 class CarparkListView extends StatefulWidget {
   @override
