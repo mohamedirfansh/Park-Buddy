@@ -138,15 +138,6 @@ class DatabaseManager {
     }
     await batch.commit(noResult: true);
   }
-
-  static Future checkWindow(DateTime start, DateTime end) async{
-    int startEpoch = start.millisecondsSinceEpoch;
-    int endEpoch = end.millisecondsSinceEpoch;
-    final dbClient = await AvailabilityDatabase.instance.database;
-
-    var count = await dbClient.rawQuery('SELECT COUNT(*) FROM $_table WHERE timestamp >= $startEpoch AND timestamp <= $endEpoch');
-    print(Sqflite.firstIntValue(count));
-  }
 }
 
 // query: https://api.data.gov.sg/v1/transport/carpark-availability?date_time=2020-03-05T01%3A40%3A27
