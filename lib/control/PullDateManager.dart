@@ -5,7 +5,7 @@ import 'DatabaseManager.dart';
 /// Handles the logic to pull dates that are missing from the database and delete dates that are outside the window.
 class PullDateManager {
   /// Defines the timeframe that we maintain the historical data for. (i.e. pullWindow = 24; historical data for the past 24 hours will be maintained.)
-  static final int pullWindow = 1*24; // 1 day
+  static final int _pullWindow = 1*24; // 1 day
 
   static Future<int> getDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -31,9 +31,9 @@ class PullDateManager {
     final int difference = nearestHour.difference(date).inHours; // get the difference between current time and last recorded date.
     final int saved = nearestHour.millisecondsSinceEpoch; // save the time so that we can store it later as reference
 
-    int pulls = (difference > pullWindow) ? pullWindow : difference; // if difference > pullWindow, means last pull was outside the window, and we need to do a complete pull.
+    int pulls = (difference > _pullWindow) ? _pullWindow : difference; // if difference > pullWindow, means last pull was outside the window, and we need to do a complete pull.
 
-    await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:pullWindow))); // delete all records outside the window
+    await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow))); // delete all records outside the window
     /*
     for (int i=0;i<pulls;i++) {
       DatabaseManager.pullCarparkAvailability(nearestHour, insertIntoDatabase: true);
