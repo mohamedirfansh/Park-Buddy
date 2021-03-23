@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/control/CarparkCSV.dart';
-import 'package:park_buddy/control/route_generator.dart';
+import 'package:park_buddy/control/RouteGenerator.dart';
 
 import 'package:park_buddy/boundary/OnBoardingPage.dart';
 
