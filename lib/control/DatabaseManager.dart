@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:convert';
 import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:park_buddy/entity/AvailabilityDatabase.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
@@ -12,10 +11,8 @@ class DatabaseManager {
 
   /// Pull Carpark Availability API an convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date, {bool insertIntoDatabase=false}) async {
-    String availJson = await CarparkAPIInterface.getCarparkJson(date);
-    final list = json.decode(availJson);
-    final items = list['items'];
-    return await _availabilityFromJson(items[0], insertIntoDatabase);
+    var items = await CarparkAPIInterface.getCarparkMap(date);
+    return await _availabilityFromJson(items, insertIntoDatabase);
   }
 
   /// private method to convert retrieved carpark availability json into CarparkAvailability object
@@ -107,11 +104,11 @@ class DatabaseManager {
   static Future<List<Map>> getCarparkList(String carparkNumber) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     List<Map> results = await dbClient.query(
-        _table,
-        columns: CarparkAvailability.columns,
-        where: 'carparkNumber = ?',
-        whereArgs: [carparkNumber],
-        orderBy: 'timestamp ASC',
+      _table,
+      columns: CarparkAvailability.columns,
+      where: 'carparkNumber = ?',
+      whereArgs: [carparkNumber],
+      orderBy: 'timestamp ASC',
     );
     return results;
   }

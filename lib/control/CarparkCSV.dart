@@ -8,19 +8,20 @@ import 'package:park_buddy/entity/CarparkType.dart';
 import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 
 class CarParkCSV {
-  static List<CarparkInfo> carparkList = List<CarparkInfo>();
+  static List<CarparkInfo> carparkList = [];
 
   static Future<List> loadData() async {
-
     final carparkData = await rootBundle
-        .loadString('assets/hdb-carpark-information-latlng.csv', cache: true);
+        .loadString(
+        'assets/hdb-carpark-information-latlng-fixed.csv', cache: true);
     if (carparkData.isEmpty) {
       throw Exception('No csv found');
     }
 
     //final res = const CsvToListConverter().convert(carparkData);
     const d = const FirstOccurrenceSettingsDetector(eols: ['\r\n', '\n']);
-    List<List<dynamic>> res = const CsvToListConverter(csvSettingsDetector: d).convert(carparkData);
+    List<List<dynamic>> res = const CsvToListConverter(csvSettingsDetector: d)
+        .convert(carparkData);
 
     for (var i = 1; i < res.length; i++) {
       CarparkType carparkType;
@@ -93,18 +94,27 @@ class CarParkCSV {
     return carparkList;
   }
 
-  static List<CarparkInfo> dataFilteredByDistance(
-      List<CarparkInfo> dataList, num limitInKM, LatLng currentPos) {
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is CarParkCSV && runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
+
+  static List<CarparkInfo> dataFilteredByDistance(List<CarparkInfo> dataList,
+      num limitInKM, LatLng currentPos) {
     Geodesy geodesy = Geodesy();
     if (dataList.length == null) {
       throw Exception('Carpark list empty.');
     }
     return dataList
         .where((carpark) =>
-            geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) <
-            limitInKM * 1000)
+    geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) <
+        limitInKM * 1000)
         .toList();
   }
+}
 
   // void _convertXYtoLatLngFromCSV async() {
   //   final coords = [];
@@ -145,4 +155,33 @@ class CarParkCSV {
   //   }
   // }
 
-}
+  //This code was used to figure out which carpark in our CSV data was not available in the API. Subsequently fixed in assets/hdb-carpark-information-latlng-fixed.csv.
+
+  // var items = await CarparkAPIInterface.getCarparkMap(DateTime.now());
+  // Set<String> duplicateSet = new Set<String>();
+  // var carparkString = items["carpark_data"];
+  // List<String> duplicateList = [];
+  // for(var i=0; i< carparkString.length; i++){
+  //   if (!duplicateSet.contains(carparkString[i]['carpark_number'])) {
+  //     duplicateSet.add(carparkString[i]['carpark_number']);
+  //   } else {
+  //     duplicateList.add(carparkString[i]['carpark_number']);
+  //   }
+  // }
+  //
+  //
+  // print('duplicate list: $duplicateList');
+  // var APIunavailableList = [];
+  //
+  // for (var i=0;i < carparkList.length; i++){
+  //   if(!duplicateSet.contains(carparkList[i].carparkCode)){
+  //     APIunavailableList.add(carparkList[i].carparkCode);
+  //   }
+  // }
+  //
+  // for (var i=0;i < APIunavailableList.length; i++){
+  //   print(APIunavailableList[i]);
+  // }
+
+  // print(APIunavailableList.length);
+

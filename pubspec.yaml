@@ -40,7 +40,10 @@ dependencies:
   uuid: any
   sqflite: any
   shared_preferences: 0.5.12
+  fl_chart: ^0.20.1
+  map_launcher: ^1.1.3
   introduction_screen: ^1.0.9
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
@@ -62,8 +65,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - hdb-carpark-information.csv
-    - hdb-carpark-information-latlng.csv
+  #this fixed list removes carparks not contained in the API data and converts the coordinates to LatLng
+    - hdb-carpark-information-latlng-fixed.csv
     - assets/images/
 
   # To add assets to your application, add an assets section, like this:
