@@ -30,7 +30,7 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    CarparkInfo carpark = CarParkCSV.carparkList.where((carpark) =>
+    CarparkInfo carpark = CarparkInfoManager.carparkList.where((carpark) =>
     carpark.carparkCode == widget.carparkCode).elementAt(0);
     return Scaffold(
       appBar: AppBar(

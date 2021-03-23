@@ -7,8 +7,12 @@ import 'package:park_buddy/entity/CarparkPaymentMethod.dart';
 import 'package:park_buddy/entity/CarparkType.dart';
 import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 
-class CarParkCSV {
-  static List<CarparkInfo> carparkList = [];
+class CarparkInfoManager {
+  static List<CarparkInfo> _carparkList = [];
+
+  static List<CarparkInfo> get carparkList {
+    return _carparkList;
+  }
 
   static Future<List> loadDataFromCSV() async {
     final carparkData = await rootBundle
@@ -97,7 +101,7 @@ class CarParkCSV {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is CarParkCSV && runtimeType == other.runtimeType;
+          other is CarparkInfoManager && runtimeType == other.runtimeType;
 
   @override
   int get hashCode => 0;

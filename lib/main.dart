@@ -7,7 +7,7 @@ import 'package:park_buddy/boundary/OnBoardingPage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Preload csv data
-  CarParkCSV.loadDataFromCSV();
+  CarparkInfoManager.loadDataFromCSV();
   runApp(MyApp());
 }
 

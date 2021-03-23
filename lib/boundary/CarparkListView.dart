@@ -29,7 +29,7 @@ class _CarparkListViewState extends State<CarparkListView> {
 
   Widget build(BuildContext context) {
     if (_center != null) {
-      final carparks = CarParkCSV.filterCarparksByDistance(CarParkCSV.carparkList,
+      final carparks = CarparkInfoManager.filterCarparksByDistance(CarparkInfoManager.carparkList,
           0.5, LatLng(_center.latitude, _center.longitude));
 
       return ListView.builder(
