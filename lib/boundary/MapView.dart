@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:park_buddy/entity/CarparkPaymentMethod.dart';
-import 'package:park_buddy/entity/CarparkType.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geodesy/geodesy.dart' as geo;
 
-import 'package:park_buddy/control/MarkerIconGenerator.dart';
+import 'package:park_buddy/entity/CarparkPaymentMethod.dart';
+import 'package:park_buddy/entity/CarparkType.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
+import 'package:park_buddy/control/MarkerIconGenerator.dart';
 import 'package:park_buddy/control/CarparkInfoManager.dart';
 
 class MapView extends StatefulWidget {
@@ -28,8 +28,10 @@ class MapViewState extends State<MapView> {
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
     var location = await Location().getLocation();
-    var filteredList = CarparkInfoManager.filterCarparksByDistance(CarparkInfoManager.carparkList,
-        0.5, geo.LatLng(location.latitude, location.longitude));
+    var filteredList = CarparkInfoManager.filterCarparksByDistance(
+        CarparkInfoManager.carparkList,
+        0.5,
+        geo.LatLng(location.latitude, location.longitude));
 
     _refreshMarkers(filteredList);
   }
@@ -106,7 +108,8 @@ class MapViewState extends State<MapView> {
   }
 
   void _openDynamicInfoPage(String carparkCode) async {
-    Navigator.pushNamed(context, '/carparkinfopage', arguments: [carparkCode, await _getCurrentLocation()]);
+    Navigator.pushNamed(context, '/carparkinfopage',
+        arguments: [carparkCode, await _getCurrentLocation()]);
   }
 
   Future<LocationData> _getCurrentLocation() async {
@@ -124,8 +127,10 @@ class MapViewState extends State<MapView> {
     final controller = await _controller.future;
 
     var currentLocation = await _getCurrentLocation();
-    _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(CarparkInfoManager.carparkList,
-        0.5, geo.LatLng(currentLocation.latitude, currentLocation.longitude)));
+    _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(
+        CarparkInfoManager.carparkList,
+        0.5,
+        geo.LatLng(currentLocation.latitude, currentLocation.longitude)));
 
     await controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
@@ -139,8 +144,10 @@ class MapViewState extends State<MapView> {
   void zoomToLocation(geo.LatLng location) async {
     final controller = await _controller.future;
 
-    _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(CarparkInfoManager.carparkList,
-        0.5, geo.LatLng(location.latitude, location.longitude)));
+    _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(
+        CarparkInfoManager.carparkList,
+        0.5,
+        geo.LatLng(location.latitude, location.longitude)));
 
     await controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
@@ -156,17 +163,17 @@ class MapViewState extends State<MapView> {
     final controller = await _controller.future;
     MarkerGenerator markerGen = MarkerGenerator(120);
     final marker = Marker(
-        icon: await markerGen.createBitmapDescriptorFromIconData(
-            Icons.location_history, Colors.blue, Colors.black, Colors.white),
-        markerId: MarkerId(locationDetails),
-        position: LatLng(location.latitude, location.longitude),
+      icon: await markerGen.createBitmapDescriptorFromIconData(
+          Icons.location_history, Colors.blue, Colors.black, Colors.white),
+      markerId: MarkerId(locationDetails),
+      position: LatLng(location.latitude, location.longitude),
     );
     setState(() {
       _markers["new"] = marker;
     });
   }
 
-  String _formatCarparkInformationForMarker(CarparkInfo carparkInfo){
+  String _formatCarparkInformationForMarker(CarparkInfo carparkInfo) {
     String carparkType = ' Carpark';
     switch (carparkInfo.carparkType) {
       case CarparkType.multistoreyAndSurface:
@@ -191,10 +198,10 @@ class MapViewState extends State<MapView> {
         carparkType = 'Basement' + carparkType;
         break;
     }
-    
+
     String paymentType = '';
-    
-    switch(carparkInfo.carparkPaymentMethod) {
+
+    switch (carparkInfo.carparkPaymentMethod) {
       case CarparkPaymentMethod.couponParking:
         paymentType = "Coupon Parking";
         break;
@@ -202,7 +209,7 @@ class MapViewState extends State<MapView> {
         paymentType = "Electronic Parking";
         break;
     }
-    
+
     return carparkType + ', ' + paymentType;
   }
 }

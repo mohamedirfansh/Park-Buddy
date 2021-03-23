@@ -11,9 +11,10 @@ class CarparkAPIInterface {
   static final jsonDateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
 
   /// Pull HDB carpark availability data for a specified date and time
-  static Future<Map> getCarparkMap(DateTime dateTime) async{
+  static Future<Map> getCarparkMap(DateTime dateTime) async {
     String d = dateFormat.format(dateTime);
-    var url = "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
+    var url =
+        "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final list = json.decode(response.body);
@@ -24,13 +25,17 @@ class CarparkAPIInterface {
     }
   }
 
-  static Future<CarparkAvailability> getSingleCarparkAvailability(DateTime dateTime, CarparkInfo carpark) async{
+  static Future<CarparkAvailability> getSingleCarparkAvailability(
+      DateTime dateTime, CarparkInfo carpark) async {
     String d = dateFormat.format(dateTime);
-    var url = "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
+    var url =
+        "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final list = json.decode(response.body);
-      final info = list['items'][0]['carpark_data'].where((item) => (item["carpark_number"] == carpark.carparkCode)).toList();
+      final info = list['items'][0]['carpark_data']
+          .where((item) => (item["carpark_number"] == carpark.carparkCode))
+          .toList();
       if (info.length > 1) {
         print("duplicate found");
       } else if (info.length < 1) {

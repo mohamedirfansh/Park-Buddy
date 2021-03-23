@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:park_buddy/control/CarparkInfoManager.dart';
 
+import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/entity/CarparkCard.dart';
 
 class CarparkListView extends StatefulWidget {
@@ -29,8 +29,10 @@ class _CarparkListViewState extends State<CarparkListView> {
 
   Widget build(BuildContext context) {
     if (_center != null) {
-      final carparks = CarparkInfoManager.filterCarparksByDistance(CarparkInfoManager.carparkList,
-          0.5, LatLng(_center.latitude, _center.longitude));
+      final carparks = CarparkInfoManager.filterCarparksByDistance(
+          CarparkInfoManager.carparkList,
+          0.5,
+          LatLng(_center.latitude, _center.longitude));
 
       return ListView.builder(
         itemCount: carparks.length,

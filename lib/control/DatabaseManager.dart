@@ -1,22 +1,24 @@
 import 'dart:collection';
-import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
-import 'package:park_buddy/entity/AvailabilityDatabase.dart';
-import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'PullDateManager.dart';
+import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
+import 'package:park_buddy/control/PullDateManager.dart';
+import 'package:park_buddy/entity/AvailabilityDatabase.dart';
+import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 class DatabaseManager {
   static final _table = "AvailabilityTable";
 
   /// Pull Carpark Availability API an convert into CarparkAvailability objects.
-  static Future<List<Map>> pullCarparkAvailability(DateTime date, {bool insertIntoDatabase=false}) async {
+  static Future<List<Map>> pullCarparkAvailability(DateTime date,
+      {bool insertIntoDatabase = false}) async {
     var items = await CarparkAPIInterface.getCarparkMap(date);
     return await _availabilityFromJson(items, insertIntoDatabase);
   }
 
   /// private method to convert retrieved carpark availability json into CarparkAvailability object
-  static Future<List<Map>> _availabilityFromJson(Map<String, dynamic> items, bool insertIntoDatabase) async {
+  static Future<List<Map>> _availabilityFromJson(
+      Map<String, dynamic> items, bool insertIntoDatabase) async {
     Map<String, int> duplicateSet = new HashMap<String, int>();
     var timestamp = items["timestamp"];
     var carparkData = items["carpark_data"];
@@ -30,9 +32,12 @@ class DatabaseManager {
         carparkList.add(item);
       } else {
         if (item.updateDatetime > duplicateSet[item.carparkNumber]) {
-          carparkList.removeWhere((c) => c.carparkNumber == item.carparkNumber); // remove the older carparkavailability
+          carparkList.removeWhere((c) =>
+              c.carparkNumber ==
+              item.carparkNumber); // remove the older carparkavailability
           carparkList.add(item);
-          duplicateSet[item.carparkNumber] = item.updateDatetime; // update duplicateSet
+          duplicateSet[item.carparkNumber] =
+              item.updateDatetime; // update duplicateSet
         }
       }
     }
@@ -43,47 +48,47 @@ class DatabaseManager {
       return returnList;
     }
   }
+
   /// insert a new CarparkAvailability object into the table
   static Future insertCarpark(CarparkAvailability carparkAvailability) async {
     var dbClient = await AvailabilityDatabase.instance.database;
     var query = await dbClient.insert(_table, carparkAvailability.toMap());
     return query;
   }
+
   /// Note: ID and timestamp must match to update a row.
   // TODO: better way to query? timestamp must be exact to find the carpark.
-  static Future<int> updateCarpark(CarparkAvailability carparkAvailability) async {
+  static Future<int> updateCarpark(
+      CarparkAvailability carparkAvailability) async {
     var dbClient = await AvailabilityDatabase.instance.database;
     Map<String, dynamic> row = carparkAvailability.toMap();
     var carparkNumber = row['carparkNumber'];
     var timestamp = row['timestamp'];
-    var query = await dbClient.update(
-        _table,
-        row,
-        where: 'carparkNumber = ? AND timestamp = ?', whereArgs: [carparkNumber, timestamp]);
+    var query = await dbClient.update(_table, row,
+        where: 'carparkNumber = ? AND timestamp = ?',
+        whereArgs: [carparkNumber, timestamp]);
     return query;
   }
 
   /// Delete a specific carpark availability record
-  static Future<int> deleteCarpark(String carparkNumber, DateTime timestamp) async {
+  static Future<int> deleteCarpark(
+      String carparkNumber, DateTime timestamp) async {
     var dbClient = await AvailabilityDatabase.instance.database;
     var time = timestamp.millisecondsSinceEpoch;
-    var query = await dbClient.delete(
-        _table,
+    var query = await dbClient.delete(_table,
         where: 'carparkNumber = ? AND timestamp = ?',
-        whereArgs: [carparkNumber, time]
-    );
+        whereArgs: [carparkNumber, time]);
     return query;
   }
 
   /// Delete one carpark's availability information before a given datetime
-  static Future<int> deleteCarparkBefore(String carparkNumber, DateTime timeBefore) async {
+  static Future<int> deleteCarparkBefore(
+      String carparkNumber, DateTime timeBefore) async {
     var dbClient = await AvailabilityDatabase.instance.database;
     var time = timeBefore.millisecondsSinceEpoch;
-    var query = await dbClient.delete(
-        _table,
+    var query = await dbClient.delete(_table,
         where: 'carparkNumber = ? AND timestamp < ?',
-        whereArgs: [carparkNumber, time]
-    );
+        whereArgs: [carparkNumber, time]);
     return query;
   }
 
@@ -91,12 +96,10 @@ class DatabaseManager {
   static Future<int> deleteAllCarparkBefore(DateTime timeBefore) async {
     var dbClient = await AvailabilityDatabase.instance.database;
     var time = timeBefore.millisecondsSinceEpoch;
-    var query = await dbClient.delete(
-        _table,
-        where: 'timestamp < ?',
-        whereArgs: [time]
-    );
-    PullDateManager.saveDate(0); // reset last pull date if deletion from database is done.
+    var query = await dbClient
+        .delete(_table, where: 'timestamp < ?', whereArgs: [time]);
+    PullDateManager.saveDate(
+        0); // reset last pull date if deletion from database is done.
     return query;
   }
 
@@ -115,18 +118,21 @@ class DatabaseManager {
 
   static void printAllCarparks() async {
     final dbClient = await AvailabilityDatabase.instance.database;
-    List<Map> results = await dbClient.query(_table, columns: CarparkAvailability.columns);
+    List<Map> results =
+        await dbClient.query(_table, columns: CarparkAvailability.columns);
 
     results.forEach((result) {
       print(result);
     });
-    int count = Sqflite.firstIntValue(await dbClient.rawQuery('SELECT COUNT(*) FROM $_table'));
+    int count = Sqflite.firstIntValue(
+        await dbClient.rawQuery('SELECT COUNT(*) FROM $_table'));
     (count > 0) ? print(count) : print("empty");
   }
 
   static Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     final batch = dbClient.batch();
+
     /// Batch insert
     for (var i = 0; i < carparks.length; i++) {
       if (carparks[i] != null) {
@@ -136,12 +142,13 @@ class DatabaseManager {
     await batch.commit(noResult: true);
   }
 
-  static Future checkWindow(DateTime start, DateTime end) async{
+  static Future checkWindow(DateTime start, DateTime end) async {
     int startEpoch = start.millisecondsSinceEpoch;
     int endEpoch = end.millisecondsSinceEpoch;
     final dbClient = await AvailabilityDatabase.instance.database;
 
-    var count = await dbClient.rawQuery('SELECT COUNT(*) FROM $_table WHERE timestamp >= $startEpoch AND timestamp <= $endEpoch');
+    var count = await dbClient.rawQuery(
+        'SELECT COUNT(*) FROM $_table WHERE timestamp >= $startEpoch AND timestamp <= $endEpoch');
     print(Sqflite.firstIntValue(count));
   }
 }

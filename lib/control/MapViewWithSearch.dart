@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart' as geo;
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:park_buddy/boundary/MapView.dart';
 import 'package:uuid/uuid.dart';
+
+import 'package:park_buddy/boundary/MapView.dart';
 import 'package:park_buddy/boundary/PlaceService.dart';
 
 class MapViewWithSearch extends StatefulWidget {
-
-
   @override
   _MapViewWithSearchState createState() => _MapViewWithSearchState();
 }
@@ -27,13 +26,11 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
   var sessionToken;
   var currentQuery = '';
 
-
   @override
   void dispose() {
     _controller.dispose();
     _searchBarController.dispose();
     super.dispose();
-
   }
 
   @override
@@ -51,7 +48,8 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
   }
 
   Widget buildFloatingSearchBar() {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     return FloatingSearchBar(
       hint: 'Search your destination carpark...',
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
@@ -70,7 +68,6 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
           currentQuery = query;
         });
       },
-
       actions: [
         FloatingSearchBarAction(
           showIfOpened: false,
@@ -89,9 +86,11 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
     );
   }
 
-  FutureBuilder<List<Suggestion>> _autocompleteSuggestionBuilder(BuildContext context) {
+  FutureBuilder<List<Suggestion>> _autocompleteSuggestionBuilder(
+      BuildContext context) {
     return FutureBuilder(
-      future: apiClient.fetchSuggestions(currentQuery, Localizations.localeOf(context).languageCode),
+      future: apiClient.fetchSuggestions(
+          currentQuery, Localizations.localeOf(context).languageCode),
       builder: (context, snapshot) {
         if (currentQuery == '') {
           return _preSearchWidget();
@@ -114,10 +113,7 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
         child: Text('Start typing to search...'),
       ),
       color: Colors.white,
-      constraints: BoxConstraints.expand(
-          width: 380,
-          height: 50
-      ),
+      constraints: BoxConstraints.expand(width: 380, height: 50),
     );
   }
 
@@ -128,43 +124,37 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
         child: Text('Loading...'),
       ),
       color: Colors.white,
-      constraints: BoxConstraints.expand(
-          width: 380,
-          height: 50
-      ),
+      constraints: BoxConstraints.expand(width: 380, height: 50),
     );
   }
 
   Widget _suggestionListViewWidget(AsyncSnapshot<List<Suggestion>> snapshot) {
     return ListView.builder(
-      itemBuilder: (context, index) =>
-          ListTile(
-            title: Text(snapshot.data[index].description),
-            onTap: () async {
-              geo.LatLng location = await apiClient.getPlaceLatLngFromId(snapshot.data[index].placeId);
-              key.currentState.zoomToLocation(location);
-              key.currentState.addMarkerForLocation(snapshot.data[index].description, location);
-              _searchBarController.close();
-            },
-            tileColor: Colors.white,
-          ),
+      itemBuilder: (context, index) => ListTile(
+        title: Text(snapshot.data[index].description),
+        onTap: () async {
+          geo.LatLng location = await apiClient
+              .getPlaceLatLngFromId(snapshot.data[index].placeId);
+          key.currentState.zoomToLocation(location);
+          key.currentState
+              .addMarkerForLocation(snapshot.data[index].description, location);
+          _searchBarController.close();
+        },
+        tileColor: Colors.white,
+      ),
       itemCount: snapshot.data.length,
       shrinkWrap: true,
     );
   }
 
-  Widget _emptyResultsWidget(){
+  Widget _emptyResultsWidget() {
     return Container(
       padding: EdgeInsets.all(16.0),
       child: Center(
         child: Text('No results found.'),
       ),
       color: Colors.white,
-      constraints: BoxConstraints.expand(
-          width: 380,
-          height: 50
-      ),
+      constraints: BoxConstraints.expand(width: 380, height: 50),
     );
   }
-
 }
