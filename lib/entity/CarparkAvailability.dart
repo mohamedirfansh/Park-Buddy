@@ -85,6 +85,43 @@ class CarparkAvailability {
       updateDatetime: dateFormat.parse(json["update_datetime"]).millisecondsSinceEpoch,
     );
   }
+
+  // Constructor from json string (non factory method)
+  CarparkAvailability.createFromJson(Map<String, dynamic> json, DateTime timestamp) {
+    final dateFormat = DateFormat('yyyy-MM-ddThh:mm:ss');
+    int totalH=0, totalC=0, totalY=0;
+    int availH=0, availC=0, availY=0;
+    int numCarparkTypes = json["carpark_info"].length;
+    for (int i=0; i<json["carpark_info"].length; i++) {
+      var currentLotInfo = json["carpark_info"][i];
+      String type = currentLotInfo["lot_type"];
+      switch (type) {
+        case "H":
+          totalH = int.parse(currentLotInfo["total_lots"]);
+          availH = int.parse(currentLotInfo["lots_available"]);
+          break;
+        case "C":
+          totalC = int.parse(currentLotInfo["total_lots"]);
+          availC = int.parse(currentLotInfo["lots_available"]);
+          break;
+        case "Y":
+          totalY = int.parse(currentLotInfo["total_lots"]);
+          availY = int.parse(currentLotInfo["lots_available"]);
+          break;
+      }
+    }
+
+    this.timestamp = timestamp.millisecondsSinceEpoch;
+    this.carparkNumber = json["carpark_number"].toString();
+    this.singleType = (numCarparkTypes == 1) ? 1 : 0;
+    this.totalLotsH = totalH;
+    this.totalLotsC = totalC;
+    this.totalLotsY = totalY;
+    this.lotsAvailableH = availH;
+    this.lotsAvailableC = availC;
+    this.lotsAvailableY = availY;
+    this.updateDatetime = dateFormat.parse(json["update_datetime"]).millisecondsSinceEpoch;
+  }
   /// Converts object to a map for storage into database
   Map<String, dynamic> toMap() {
     return {

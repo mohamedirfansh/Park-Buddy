@@ -1,8 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:location/location.dart';
+import 'package:park_buddy/entity/CarparkPaymentMethod.dart';
+import 'package:park_buddy/entity/CarparkType.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:geodesy/geodesy.dart' as geo;
 
 import 'package:park_buddy/control/MarkerIconGenerator.dart';
@@ -89,12 +92,11 @@ class MapViewState extends State<MapView> {
         markerId: MarkerId(carpark.carparkCode),
         position: LatLng(carpark.latlng.latitude, carpark.latlng.longitude),
         infoWindow: InfoWindow(
-          title: carpark.carparkCode,
-          snippet:
-              '${carpark.address}, ${carpark.carparkPaymentMethod}, ${carpark.carparkType}, ${carpark.shortTermParking}',
+          title: carpark.address,
+          snippet: _formatCarparkInformationForMarker(carpark),
           //TODO: UI for lot availability
-          //TODO: backend for querying carpark API (able to query any
-          onTap: () => _OpenDynamicInfoPage(carpark.carparkCode),
+          //TODO: backend for querying carpark API (able to query anyR
+          onTap: () => _openDynamicInfoPage(carpark.carparkCode),
         ),
       );
       markers[carpark.carparkCode] = marker;
@@ -103,12 +105,11 @@ class MapViewState extends State<MapView> {
     return markers;
   }
 
-  void _OpenDynamicInfoPage(String carparkCode) {
-    Navigator.pushNamed(context, '/carparkinfopage', arguments: carparkCode);
+  void _openDynamicInfoPage(String carparkCode) async {
+    Navigator.pushNamed(context, '/carparkinfopage', arguments: [carparkCode, await _getCurrentLocation()]);
   }
 
-  void _zoomToCurrentLocation() async {
-    final controller = await _controller.future;
+  Future<LocationData> _getCurrentLocation() async {
     LocationData currentLocation;
     var location = Location();
     try {
@@ -116,7 +117,13 @@ class MapViewState extends State<MapView> {
     } on Exception {
       currentLocation = null;
     }
+    return currentLocation;
+  }
 
+  void _zoomToCurrentLocation() async {
+    final controller = await _controller.future;
+
+    var currentLocation = await _getCurrentLocation();
     _refreshMarkers(CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
         0.5, geo.LatLng(currentLocation.latitude, currentLocation.longitude)));
 
@@ -153,11 +160,49 @@ class MapViewState extends State<MapView> {
             Icons.location_history, Colors.blue, Colors.black, Colors.white),
         markerId: MarkerId(locationDetails),
         position: LatLng(location.latitude, location.longitude),
-        onTap: () async {
-          print(await controller.getZoomLevel());
-        });
+    );
     setState(() {
       _markers["new"] = marker;
     });
+  }
+
+  String _formatCarparkInformationForMarker(CarparkInfo carparkInfo){
+    String carparkType = ' Carpark';
+    switch (carparkInfo.carparkType) {
+      case CarparkType.multistoreyAndSurface:
+        carparkType = 'Multistorey and Surface' + carparkType;
+        break;
+      case CarparkType.multistorey:
+        carparkType = 'Multistorey' + carparkType;
+        break;
+      case CarparkType.mechanisedAndSurface:
+        carparkType = 'Mechanised Surface' + carparkType;
+        break;
+      case CarparkType.mechanised:
+        carparkType = 'Mechanised' + carparkType;
+        break;
+      case CarparkType.covered:
+        carparkType = 'Covered' + carparkType;
+        break;
+      case CarparkType.surface:
+        carparkType = 'Surface' + carparkType;
+        break;
+      case CarparkType.basement:
+        carparkType = 'Basement' + carparkType;
+        break;
+    }
+    
+    String paymentType = '';
+    
+    switch(carparkInfo.carparkPaymentMethod) {
+      case CarparkPaymentMethod.couponParking:
+        paymentType = "Coupon Parking";
+        break;
+      case CarparkPaymentMethod.electronicParking:
+        paymentType = "Electronic Parking";
+        break;
+    }
+    
+    return carparkType + ', ' + paymentType;
   }
 }
