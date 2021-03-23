@@ -10,7 +10,7 @@ import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 class CarParkCSV {
   static List<CarparkInfo> carparkList = [];
 
-  static Future<List> loadData() async {
+  static Future<List> loadDataFromCSV() async {
     final carparkData = await rootBundle
         .loadString(
         'assets/hdb-carpark-information-latlng-fixed.csv', cache: true);
@@ -102,7 +102,7 @@ class CarParkCSV {
   @override
   int get hashCode => 0;
 
-  static List<CarparkInfo> dataFilteredByDistance(List<CarparkInfo> dataList,
+  static List<CarparkInfo> filterCarparksByDistance(List<CarparkInfo> dataList,
       num limitInKM, LatLng currentPos) {
     Geodesy geodesy = Geodesy();
     if (dataList.length == null) {

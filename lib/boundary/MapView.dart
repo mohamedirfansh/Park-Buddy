@@ -10,7 +10,7 @@ import 'package:geodesy/geodesy.dart' as geo;
 
 import 'package:park_buddy/control/MarkerIconGenerator.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
-import 'package:park_buddy/control/CarparkCSV.dart';
+import 'package:park_buddy/control/CarparkInfoManager.dart';
 
 class MapView extends StatefulWidget {
   MapView({Key key}) : super(key: key);
@@ -28,7 +28,7 @@ class MapViewState extends State<MapView> {
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
     var location = await Location().getLocation();
-    var filteredList = CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
+    var filteredList = CarParkCSV.filterCarparksByDistance(CarParkCSV.carparkList,
         0.5, geo.LatLng(location.latitude, location.longitude));
 
     _refreshMarkers(filteredList);
@@ -124,7 +124,7 @@ class MapViewState extends State<MapView> {
     final controller = await _controller.future;
 
     var currentLocation = await _getCurrentLocation();
-    _refreshMarkers(CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
+    _refreshMarkers(CarParkCSV.filterCarparksByDistance(CarParkCSV.carparkList,
         0.5, geo.LatLng(currentLocation.latitude, currentLocation.longitude)));
 
     await controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -139,7 +139,7 @@ class MapViewState extends State<MapView> {
   void zoomToLocation(geo.LatLng location) async {
     final controller = await _controller.future;
 
-    _refreshMarkers(CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
+    _refreshMarkers(CarParkCSV.filterCarparksByDistance(CarParkCSV.carparkList,
         0.5, geo.LatLng(location.latitude, location.longitude)));
 
     await controller.animateCamera(CameraUpdate.newCameraPosition(

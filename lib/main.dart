@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:park_buddy/control/CarparkCSV.dart';
+import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/control/RouteGenerator.dart';
 
 import 'package:park_buddy/boundary/OnBoardingPage.dart';
@@ -7,7 +7,7 @@ import 'package:park_buddy/boundary/OnBoardingPage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Preload csv data
-  CarParkCSV.loadData();
+  CarParkCSV.loadDataFromCSV();
   runApp(MyApp());
 }
 

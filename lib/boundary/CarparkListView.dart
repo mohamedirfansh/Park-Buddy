@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:park_buddy/control/CarparkCSV.dart';
+import 'package:park_buddy/control/CarparkInfoManager.dart';
 
 import 'package:park_buddy/entity/CarparkCard.dart';
 
@@ -29,7 +29,7 @@ class _CarparkListViewState extends State<CarparkListView> {
 
   Widget build(BuildContext context) {
     if (_center != null) {
-      final carparks = CarParkCSV.dataFilteredByDistance(CarParkCSV.carparkList,
+      final carparks = CarParkCSV.filterCarparksByDistance(CarParkCSV.carparkList,
           0.5, LatLng(_center.latitude, _center.longitude));
 
       return ListView.builder(

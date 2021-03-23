@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
-import 'package:park_buddy/control/CarparkCSV.dart';
+import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:park_buddy/Histogram.dart';
