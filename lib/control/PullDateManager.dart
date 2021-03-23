@@ -29,7 +29,7 @@ class PullDateManager {
     if (nearestHour.minute == 0)
       nearestHour = nearestHour.subtract(Duration(minutes:30));
     final int difference = nearestHour.difference(date).inHours; // get the difference between current time and last recorded date.
-    final int saved = nearestHour.millisecondsSinceEpoch; // save the time so that we can store it later as reference
+    final int saved = nearestHour.millisecondsSinceEpoch; // save the time so that we can storpue it later as reference
 
     int pulls = (difference > _pullWindow) ? _pullWindow : difference; // if difference > pullWindow, means last pull was outside the window, and we need to do a complete pull.
 

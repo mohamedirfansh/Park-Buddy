@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:park_buddy/boundary/TabsPage.dart';
+import 'package:park_buddy/control/TabsPage.dart';
 import 'package:park_buddy/boundary/carpark_info_page.dart';
 
 class RouteGenerator {

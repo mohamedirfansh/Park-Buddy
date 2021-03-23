@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:park_buddy/control/TabNavigationItem.dart';
+import 'package:park_buddy/entity/TabNavigationItem.dart';
 
 class MultiTabView extends StatefulWidget {
   @override
