@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/boundary/CarparkInfoPage.dart';
+import 'package:park_buddy/control/TabsPage.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -11,6 +12,9 @@ class RouteGenerator {
         return  MaterialPageRoute(builder: (_) => CarparkInfoPage(carparkData[0], carparkData[1]));
         break;
       case '/listview':
+        break;
+      case '/multitabview':
+        return MaterialPageRoute(builder: (_) => MultiTabView());
         break;
       default:
         return _errorRoute();

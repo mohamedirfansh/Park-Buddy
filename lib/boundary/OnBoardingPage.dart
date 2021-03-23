@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'package:park_buddy/boundary/TabsPage.dart';
 
 class OnBoardingPage extends StatelessWidget {
   @override
@@ -40,9 +39,8 @@ class OnBoardingPage extends StatelessWidget {
         ),
       );
 
-  void goToHome(context) => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => MultiTabView()),
-      );
+  void goToHome(context) => Navigator.pushNamed(context, '/multitabview');
+
 
   PageDecoration getPageDecoration() => PageDecoration(
         titleTextStyle: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
