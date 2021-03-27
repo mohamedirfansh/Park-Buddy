@@ -11,18 +11,20 @@ import 'package:park_buddy/Histogram.dart';
 class CarparkInfoPage extends StatefulWidget {
   final String carparkCode;
   final LocationData userLocation;
+  final CarparkAvailability carparkAvailability;
   CarparkInfoPage(this.carparkCode,
-      this.userLocation); // constructor: pass info of which carpark
+      this.userLocation, this.carparkAvailability); // constructor: pass info of which carpark
 
   @override
   _CarparkInfoPageState createState() =>
-      _CarparkInfoPageState(this.carparkCode, this.userLocation);
+      _CarparkInfoPageState(this.carparkCode, this.userLocation, this.carparkAvailability);
 }
 
 class _CarparkInfoPageState extends State<CarparkInfoPage> {
-  _CarparkInfoPageState(this.carparkCode, this.currentLocation);
+  _CarparkInfoPageState(this.carparkCode, this.currentLocation, this.carparkAvailability);
   final String carparkCode;
   final LocationData currentLocation;
+  final CarparkAvailability carparkAvailability;
 
   double getDistance(double carparkLat, double carparkLong) {
     final double distance = Geodesy().distanceBetweenTwoGeoPoints(LatLng(carparkLat, carparkLong), LatLng(currentLocation.latitude, currentLocation.longitude));
@@ -114,8 +116,11 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
         ]));
   }
 
-  FutureBuilder<CarparkAvailability> _carparkInfoSectionBuilder(
+  Widget _carparkInfoSectionBuilder(
       BuildContext context, CarparkInfo carpark) {
+    if (carparkAvailability != null){
+      return _carparkAvailabilityInfoSection(carpark, carparkAvailability);
+    }
     return FutureBuilder(
       future: _getCarparkAvailability(carpark),
       builder: (context, snapshot) {

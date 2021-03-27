@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart' as geo;
+import 'package:location/location.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:park_buddy/boundary/MapView.dart';
 import 'package:park_buddy/boundary/PlaceService.dart';
+
+import 'LocationManager.dart';
 
 class MapViewWithSearch extends StatefulWidget {
   @override
@@ -135,10 +138,25 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
         onTap: () async {
           geo.LatLng location = await apiClient
               .getPlaceLatLngFromId(snapshot.data[index].placeId);
-          key.currentState.zoomToLatLng(location);
+
+          Map<String, double> dataMap = {
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+            'accuracy': 0,
+            'altitude': 0,
+            'speed': 0,
+            'speed_accuracy': 0,
+            'heading': 0,
+            'time': 0,
+          };
+          LocationData updated = LocationData.fromMap(dataMap);
+          LocationManager.intendedLocation = updated;
+
+          key.currentState.zoomToLocation(location);
           key.currentState
-              .addMarkerForLatLng(snapshot.data[index].description, location);
+              .addMarkerForLocation(snapshot.data[index].description, location);
           _searchBarController.close();
+
         },
         tileColor: Colors.white,
       ),

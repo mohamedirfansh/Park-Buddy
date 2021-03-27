@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geodesy/geodesy.dart' as geo;
 import 'package:park_buddy/control/LocationManager.dart';
@@ -11,6 +12,7 @@ import 'package:park_buddy/entity/CarparkType.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 import 'package:park_buddy/control/MarkerIconGenerator.dart';
 import 'package:park_buddy/control/CarparkInfoManager.dart';
+import 'package:park_buddy/control/ScreenManager.dart';
 
 class MapView extends StatefulWidget {
   MapView({Key key}) : super(key: key);
@@ -99,7 +101,7 @@ class MapViewState extends State<MapView> {
           snippet: _formatCarparkInformationForMarker(carpark),
           //TODO: UI for lot availability
           //TODO: backend for querying carpark API (able to query anyR
-          onTap: () => _openDynamicInfoPage(carpark.carparkCode),
+          onTap: () => ScreenManager.openDynamicInfoPage(context, carpark.carparkCode, null),
         ),
       );
       markers[carpark.carparkCode] = marker;
@@ -108,15 +110,11 @@ class MapViewState extends State<MapView> {
     return markers;
   }
 
-  void _openDynamicInfoPage(String carparkCode) async {
-    Navigator.pushNamed(context, '/carparkinfopage',
-        arguments: [carparkCode, await LocationManager.currentLocation]);
-  }
-
   void _zoomToCurrentLocation() async {
     final controller = await _controller.future;
 
     var currentLocation = await LocationManager.currentLocation;
+    LocationManager.locationIsDestination = true;
     _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(
         CarparkInfoManager.carparkList,
         0.5,
@@ -131,7 +129,7 @@ class MapViewState extends State<MapView> {
     ));
   }
 
-  void zoomToLatLng(geo.LatLng location) async {
+  void zoomToLocation(geo.LatLng location) async {
     final controller = await _controller.future;
 
     _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(
@@ -149,7 +147,7 @@ class MapViewState extends State<MapView> {
     ));
   }
 
-  void addMarkerForLatLng(String locationDetails, geo.LatLng location) async {
+  void addMarkerForLocation(String locationDetails, geo.LatLng location) async {
     final controller = await _controller.future;
     MarkerGenerator markerGen = MarkerGenerator(120);
     final marker = Marker(

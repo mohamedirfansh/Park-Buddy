@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/boundary/CarparkInfoPage.dart';
 import 'package:park_buddy/control/TabsManager.dart';
+import 'package:park_buddy/entity/CarparkAvailability.dart';
 
-class RouteGenerator {
+import 'LocationManager.dart';
+
+class ScreenManager {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
 
@@ -10,7 +13,7 @@ class RouteGenerator {
       case '/carparkinfopage':
         var carparkData = args as List;
         return MaterialPageRoute(
-            builder: (_) => CarparkInfoPage(carparkData[0], carparkData[1]));
+            builder: (_) => CarparkInfoPage(carparkData[0], carparkData[1], carparkData[2]));
         break;
       case '/listview':
         break;
@@ -30,5 +33,10 @@ class RouteGenerator {
           ),
           body: Center(child: Text('ERROR')));
     });
+  }
+
+  static void openDynamicInfoPage(BuildContext context, String carparkCode, CarparkAvailability carparkAvailability) async {
+    Navigator.pushNamed(context, '/carparkinfopage',
+        arguments: [carparkCode, await LocationManager.currentLocation, carparkAvailability]);
   }
 }

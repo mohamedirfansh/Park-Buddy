@@ -71,9 +71,6 @@ class CarparkAPIInterface {
       carparkList.forEach((carpark) => carparkAvailabilityMap[carpark["carpark_number"]] = CarparkAvailability.createFromJson(carpark, dateTime));
       return carparkAvailabilityMap;
     } else {
-      print("error fetching api");
-      print(response.statusCode);
-      print(response.body);
       throw Exception("Failed to retrieve Carpark API data");
     }
   }

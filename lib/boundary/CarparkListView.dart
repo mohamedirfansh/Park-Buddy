@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -14,30 +17,40 @@ class CarparkListView extends StatefulWidget {
 }
 
 class _CarparkListViewState extends State<CarparkListView> {
-  LatLng _center;
   LocationData currentLocation;
 
-  getUserLocation() async {
-    currentLocation = await LocationManager.currentLocation;
-    setState(() {
-      _center = LatLng(currentLocation.latitude, currentLocation.longitude);
-    });
+  Future<LocationData> getUserLocation() async {
+    return await LocationManager.currentLocation;
   }
 
   Widget build(BuildContext context) {
-    if (_center != null) {
-      return CarparkListManager().constructList(_center, currentLocation);
-    } else {
-      getUserLocation();
-      return Container(
-        color: Colors.white,
-        child: Center(
-          child: SpinKitRing(
-            color: Colors.cyan[300],
-            size: 50.0,
-          ),
+    return FutureBuilder(
+        future: getUserLocation(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData && !snapshot.hasError) {
+            //Loading
+            return _loadingWidget(false);
+          } else if (snapshot.hasError) {
+            return _loadingWidget(true);
+          } else if (snapshot.hasData && snapshot.data != null) {
+            return CarparkListManager().constructList(snapshot.data);
+          } else {
+            //Error
+            return Container(child: Text("Error"));
+          }
+        }
+    );
+  }
+
+  Widget _loadingWidget(bool error) {
+    return Container(
+      color: Colors.white,
+      child: Center(
+        child: SpinKitRing(
+          color: error ? Colors.purple : Colors.cyan[300],
+          size: 50.0,
         ),
-      );
-    }
+      ),
+    );
   }
 }
