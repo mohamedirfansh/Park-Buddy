@@ -20,7 +20,11 @@ class _CarparkListViewState extends State<CarparkListView> {
   LocationData currentLocation;
 
   Future<LocationData> getUserLocation() async {
-    return await LocationManager.currentLocation;
+    if (LocationManager.locationModeSelf) {
+      return await LocationManager.currentLocation;
+    } else {
+      return LocationManager.intendedLocation;
+    }
   }
 
   Widget build(BuildContext context) {

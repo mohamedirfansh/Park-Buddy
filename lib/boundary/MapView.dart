@@ -114,7 +114,7 @@ class MapViewState extends State<MapView> {
     final controller = await _controller.future;
 
     var currentLocation = await LocationManager.currentLocation;
-    LocationManager.locationIsDestination = true;
+    LocationManager.locationModeSelf = true;
     _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(
         CarparkInfoManager.carparkList,
         0.5,
