@@ -34,7 +34,6 @@ dependencies:
   location: ^3.2.4
   material_floating_search_bar: ^0.2.6
   geodesy: ^0.3.2
-  geolocator: ^6.2.1
   flutter_spinkit: ^4.1.2+1
   dio: any
   uuid: any

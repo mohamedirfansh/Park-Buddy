@@ -135,9 +135,9 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
         onTap: () async {
           geo.LatLng location = await apiClient
               .getPlaceLatLngFromId(snapshot.data[index].placeId);
-          key.currentState.zoomToLocation(location);
+          key.currentState.zoomToLatLng(location);
           key.currentState
-              .addMarkerForLocation(snapshot.data[index].description, location);
+              .addMarkerForLatLng(snapshot.data[index].description, location);
           _searchBarController.close();
         },
         tileColor: Colors.white,

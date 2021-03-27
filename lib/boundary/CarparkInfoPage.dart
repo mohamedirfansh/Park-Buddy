@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geodesy/geodesy.dart';
 import 'package:location/location.dart';
-import 'package:geolocator/geolocator.dart';
 
 import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
@@ -25,8 +25,7 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
   final LocationData currentLocation;
 
   double getDistance(double carparkLat, double carparkLong) {
-    final double distance = Geolocator.distanceBetween(carparkLat, carparkLong,
-        currentLocation.latitude, currentLocation.longitude);
+    final double distance = Geodesy().distanceBetweenTwoGeoPoints(LatLng(carparkLat, carparkLong), LatLng(currentLocation.latitude, currentLocation.longitude));
     return distance * 0.001; //distance in kilometers
   }
 

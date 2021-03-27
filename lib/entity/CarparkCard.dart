@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
 
 class CarparkCard extends StatelessWidget {
   final CarparkInfo carpark;
-  CarparkCard({this.carpark});
+  final CarparkAvailability carparkAvailability;
+  CarparkCard(this.carpark, this.carparkAvailability);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class CarparkCard extends StatelessWidget {
                 style: TextStyle(fontSize: 15.0),
               ),
               Text(
-                'Availability Goes here: 95/100',
+                "${carparkAvailability.lotsAvailableC}/${carparkAvailability.totalLotsC} lots available",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],

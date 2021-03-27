@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:location/location.dart';
 
 import 'package:park_buddy/control/CarparkInfoManager.dart';
+import 'package:park_buddy/control/CarparkListManager.dart';
+import 'package:park_buddy/control/LocationManager.dart';
 import 'package:park_buddy/entity/CarparkCard.dart';
 
 class CarparkListView extends StatefulWidget {
@@ -13,15 +15,10 @@ class CarparkListView extends StatefulWidget {
 
 class _CarparkListViewState extends State<CarparkListView> {
   LatLng _center;
-  Position currentLocation;
-
-  Future<Position> locateUser() async {
-    return Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-  }
+  LocationData currentLocation;
 
   getUserLocation() async {
-    currentLocation = await locateUser();
+    currentLocation = await LocationManager.currentLocation;
     setState(() {
       _center = LatLng(currentLocation.latitude, currentLocation.longitude);
     });
@@ -29,17 +26,7 @@ class _CarparkListViewState extends State<CarparkListView> {
 
   Widget build(BuildContext context) {
     if (_center != null) {
-      final carparks = CarparkInfoManager.filterCarparksByDistance(
-          CarparkInfoManager.carparkList,
-          0.5,
-          LatLng(_center.latitude, _center.longitude));
-
-      return ListView.builder(
-        itemCount: carparks.length,
-        itemBuilder: (context, index) {
-          return CarparkCard(carpark: carparks[index]);
-        },
-      );
+      return CarparkListManager().constructList(_center, currentLocation);
     } else {
       getUserLocation();
       return Container(
