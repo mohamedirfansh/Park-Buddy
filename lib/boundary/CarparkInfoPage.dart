@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:location/location.dart';
+import 'package:map_launcher/map_launcher.dart';
 
 import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
@@ -70,6 +71,19 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
                     Histogram(),
                   ],
                 )),
+            Card(
+                elevation: 4,
+                margin: EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: ListTile(
+                  leading: ImageIcon(AssetImage("assets/images/Google_Maps_Icon.png")
+                  ),
+                  title: Text("Get directions with Google Maps"),
+                  onTap: () => goToGoogleMaps(carpark),
+                )
+            )
           ],
         ),
       ),
@@ -160,7 +174,14 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
               style: TextStyle(fontSize: 15)),
         ]));
   }
+
+  Future<void> goToGoogleMaps(CarparkInfo info) async {
+    final availableMaps = await MapLauncher.installedMaps;
+    await availableMaps.first.showDirections(
+      destinationTitle: info.address,
+      destination: Coords(info.latlng.latitude, info.latlng.longitude),
+    );
+  }
 }
 
-//TODO: button to link to google maps app for directions (figure out function call from the default Marker onTap behaviour)
 //TODO: histogram (queried on demand, show current time data)
