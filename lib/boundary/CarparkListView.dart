@@ -1,9 +1,14 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:geodesy/geodesy.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:location/location.dart';
 
 import 'package:park_buddy/control/CarparkInfoManager.dart';
+import 'package:park_buddy/control/CarparkListManager.dart';
+import 'package:park_buddy/control/LocationManager.dart';
 import 'package:park_buddy/entity/CarparkCard.dart';
 
 class CarparkListView extends StatefulWidget {
@@ -12,45 +17,44 @@ class CarparkListView extends StatefulWidget {
 }
 
 class _CarparkListViewState extends State<CarparkListView> {
-  LatLng _center;
-  Position currentLocation;
+  LocationData currentLocation;
 
-  Future<Position> locateUser() async {
-    return Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-  }
-
-  getUserLocation() async {
-    currentLocation = await locateUser();
-    setState(() {
-      _center = LatLng(currentLocation.latitude, currentLocation.longitude);
-    });
+  Future<LocationData> getUserLocation() async {
+    if (LocationManager.locationModeSelf) {
+      return await LocationManager.currentLocation;
+    } else {
+      return LocationManager.intendedLocation;
+    }
   }
 
   Widget build(BuildContext context) {
-    if (_center != null) {
-      final carparks = CarparkInfoManager.filterCarparksByDistance(
-          CarparkInfoManager.carparkList,
-          0.5,
-          LatLng(_center.latitude, _center.longitude));
+    return FutureBuilder(
+        future: getUserLocation(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData && !snapshot.hasError) {
+            //Loading
+            return _loadingWidget(false);
+          } else if (snapshot.hasError) {
+            return _loadingWidget(true);
+          } else if (snapshot.hasData && snapshot.data != null) {
+            return CarparkListManager().constructList(snapshot.data);
+          } else {
+            //Error
+            return Container(child: Text("Error"));
+          }
+        }
+    );
+  }
 
-      return ListView.builder(
-        itemCount: carparks.length,
-        itemBuilder: (context, index) {
-          return CarparkCard(carpark: carparks[index]);
-        },
-      );
-    } else {
-      getUserLocation();
-      return Container(
-        color: Colors.white,
-        child: Center(
-          child: SpinKitRing(
-            color: Colors.cyan[300],
-            size: 50.0,
-          ),
+  Widget _loadingWidget(bool error) {
+    return Container(
+      color: Colors.white,
+      child: Center(
+        child: SpinKitRing(
+          color: error ? Colors.purple : Colors.cyan[300],
+          size: 50.0,
         ),
-      );
-    }
+      ),
+    );
   }
 }

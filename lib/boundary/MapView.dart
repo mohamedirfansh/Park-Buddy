@@ -5,12 +5,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geodesy/geodesy.dart' as geo;
+import 'package:park_buddy/control/LocationManager.dart';
 
 import 'package:park_buddy/entity/CarparkPaymentMethod.dart';
 import 'package:park_buddy/entity/CarparkType.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 import 'package:park_buddy/control/MarkerIconGenerator.dart';
 import 'package:park_buddy/control/CarparkInfoManager.dart';
+import 'package:park_buddy/control/ScreenManager.dart';
 
 class MapView extends StatefulWidget {
   MapView({Key key}) : super(key: key);
@@ -27,13 +29,14 @@ class MapViewState extends State<MapView> {
   final Map<String, Marker> _markers = {};
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
-    var location = await Location().getLocation();
+    var location = await LocationManager.currentLocation;
     var filteredList = CarparkInfoManager.filterCarparksByDistance(
         CarparkInfoManager.carparkList,
         0.5,
         geo.LatLng(location.latitude, location.longitude));
 
     _refreshMarkers(filteredList);
+    _zoomToCurrentLocation();
   }
 
   void _refreshMarkers(List<CarparkInfo> list) {
@@ -98,7 +101,7 @@ class MapViewState extends State<MapView> {
           snippet: _formatCarparkInformationForMarker(carpark),
           //TODO: UI for lot availability
           //TODO: backend for querying carpark API (able to query anyR
-          onTap: () => _openDynamicInfoPage(carpark.carparkCode),
+          onTap: () => ScreenManager.openDynamicInfoPage(context, carpark.carparkCode, null),
         ),
       );
       markers[carpark.carparkCode] = marker;
@@ -107,26 +110,11 @@ class MapViewState extends State<MapView> {
     return markers;
   }
 
-  void _openDynamicInfoPage(String carparkCode) async {
-    Navigator.pushNamed(context, '/carparkinfopage',
-        arguments: [carparkCode, await _getCurrentLocation()]);
-  }
-
-  Future<LocationData> _getCurrentLocation() async {
-    LocationData currentLocation;
-    var location = Location();
-    try {
-      currentLocation = await location.getLocation();
-    } on Exception {
-      currentLocation = null;
-    }
-    return currentLocation;
-  }
-
   void _zoomToCurrentLocation() async {
     final controller = await _controller.future;
 
-    var currentLocation = await _getCurrentLocation();
+    var currentLocation = await LocationManager.currentLocation;
+    LocationManager.locationModeSelf = true;
     _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(
         CarparkInfoManager.carparkList,
         0.5,
@@ -136,7 +124,7 @@ class MapViewState extends State<MapView> {
       CameraPosition(
         bearing: 0,
         target: LatLng(currentLocation.latitude, currentLocation.longitude),
-        zoom: await controller.getZoomLevel(),
+        zoom: 15.0,
       ),
     ));
   }

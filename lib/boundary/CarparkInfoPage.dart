@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:geodesy/geodesy.dart';
 import 'package:location/location.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:map_launcher/map_launcher.dart';
 
 import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
@@ -11,22 +12,23 @@ import 'package:park_buddy/Histogram.dart';
 class CarparkInfoPage extends StatefulWidget {
   final String carparkCode;
   final LocationData userLocation;
+  final CarparkAvailability carparkAvailability;
   CarparkInfoPage(this.carparkCode,
-      this.userLocation); // constructor: pass info of which carpark
+      this.userLocation, this.carparkAvailability); // constructor: pass info of which carpark
 
   @override
   _CarparkInfoPageState createState() =>
-      _CarparkInfoPageState(this.carparkCode, this.userLocation);
+      _CarparkInfoPageState(this.carparkCode, this.userLocation, this.carparkAvailability);
 }
 
 class _CarparkInfoPageState extends State<CarparkInfoPage> {
-  _CarparkInfoPageState(this.carparkCode, this.currentLocation);
+  _CarparkInfoPageState(this.carparkCode, this.currentLocation, this.carparkAvailability);
   final String carparkCode;
   final LocationData currentLocation;
+  final CarparkAvailability carparkAvailability;
 
   double getDistance(double carparkLat, double carparkLong) {
-    final double distance = Geolocator.distanceBetween(carparkLat, carparkLong,
-        currentLocation.latitude, currentLocation.longitude);
+    final double distance = Geodesy().distanceBetweenTwoGeoPoints(LatLng(carparkLat, carparkLong), LatLng(currentLocation.latitude, currentLocation.longitude));
     return distance * 0.001; //distance in kilometers
   }
 
@@ -69,6 +71,19 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
                     Histogram(),
                   ],
                 )),
+            Card(
+                elevation: 4,
+                margin: EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: ListTile(
+                  leading: ImageIcon(AssetImage("assets/images/Google_Maps_Icon.png")
+                  ),
+                  title: Text("Get directions with Google Maps"),
+                  onTap: () => goToGoogleMaps(carpark),
+                )
+            )
           ],
         ),
       ),
@@ -115,8 +130,11 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
         ]));
   }
 
-  FutureBuilder<CarparkAvailability> _carparkInfoSectionBuilder(
+  Widget _carparkInfoSectionBuilder(
       BuildContext context, CarparkInfo carpark) {
+    if (carparkAvailability != null){
+      return _carparkAvailabilityInfoSection(carpark, carparkAvailability);
+    }
     return FutureBuilder(
       future: _getCarparkAvailability(carpark),
       builder: (context, snapshot) {
@@ -156,7 +174,14 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
               style: TextStyle(fontSize: 15)),
         ]));
   }
+
+  Future<void> goToGoogleMaps(CarparkInfo info) async {
+    final availableMaps = await MapLauncher.installedMaps;
+    await availableMaps.first.showDirections(
+      destinationTitle: info.address,
+      destination: Coords(info.latlng.latitude, info.latlng.longitude),
+    );
+  }
 }
 
-//TODO: button to link to google maps app for directions (figure out function call from the default Marker onTap behaviour)
 //TODO: histogram (queried on demand, show current time data)
