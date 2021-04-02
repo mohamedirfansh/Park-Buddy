@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ParkBuddy',
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Stack(children: [
           //MultiTabView(),
