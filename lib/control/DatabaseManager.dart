@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
-import 'package:park_buddy/control/PullDateManager.dart';
 import 'package:park_buddy/entity/AvailabilityDatabase.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
 
@@ -98,8 +97,6 @@ class DatabaseManager {
     var time = timeBefore.millisecondsSinceEpoch;
     var query = await dbClient
         .delete(_table, where: 'timestamp < ?', whereArgs: [time]);
-    PullDateManager.saveDate(
-        0); // reset last pull date if deletion from database is done.
     return query;
   }
 
