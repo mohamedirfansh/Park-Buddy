@@ -18,6 +18,11 @@ class PullDateManager {
     prefs.setInt('date', lastEpochDate);
   }
 
+  static resetDate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('date', 0);
+  }
+
   static pullMissingDates() async {
     int lastDate = await getDate();
 
@@ -32,8 +37,8 @@ class PullDateManager {
     final int saved = nearestHour.millisecondsSinceEpoch; // save the time so that we can storpue it later as reference
 
     int pulls = (difference > _pullWindow) ? _pullWindow : difference; // if difference > pullWindow, means last pull was outside the window, and we need to do a complete pull.
-
-    await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow))); // delete all records outside the window
+    if (pulls >= _pullWindow) await DatabaseManager.deleteAllCarparkBefore(now); // delete all records if need to do a complete pull
+    else await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow))); // delete all records outside the window otherwise
     /*
     for (int i=0;i<pulls;i++) {
       DatabaseManager.pullCarparkAvailability(nearestHour, insertIntoDatabase: true);
@@ -41,13 +46,24 @@ class PullDateManager {
     }
      */
     List<DateTime> pullList = new List<DateTime>();
-    pullList.add(nearestHour);
-    DateTime dec = new DateTime(nearestHour.year,nearestHour.month,nearestHour.day,nearestHour.hour,nearestHour.minute); // clone nearest hour for increment purposes
-    for (int i=1;i<pulls;i++) {
-      dec = dec.subtract(Duration(hours: 1));
-      pullList.add(dec);
+    if (pulls > 0) {
+      pullList.add(nearestHour);
+      DateTime dec = new DateTime(
+          nearestHour.year, nearestHour.month, nearestHour.day,
+          nearestHour.hour,
+          nearestHour.minute); // clone nearest hour for increment purposes
+      for (int i = 1; i < pulls; i++) {
+        dec = dec.subtract(Duration(hours: 1));
+        pullList.add(dec);
+      }
+      try {
+        await Future.wait(pullList.map((e) =>
+            DatabaseManager.pullCarparkAvailability(e,
+                insertIntoDatabase: true))); // pull async, since we don't care about the order
+      } catch (DatabaseException) {
+        resetDate(); // if error during insertion, reset the pull date and do a pull from scratch the next time around.
+      }
     }
-    await Future.wait(pullList.map((e) => DatabaseManager.pullCarparkAvailability(e, insertIntoDatabase: true))); // pull async, since we don't care about the order
     saveDate(saved);
   }
 }
