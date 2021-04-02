@@ -9,19 +9,27 @@ class OnBoardingPage extends StatelessWidget {
             PageViewModel(
               title: 'Parking lots',
               body: 'Find parking lots near you',
-              //image: buildImage('assets/image.png'),
+              image: buildImage('assets/images/carparks_near.png'),
               decoration: getPageDecoration(),
             ),
             PageViewModel(
-              title: 'Parking lots',
-              body: 'Find parking lots near you',
-              //image: buildImage('assets/image.png'),
+              title: 'Search destination',
+              body:
+                  'Search for a location to find carparks near your destination',
+              image: buildImage('assets/images/search.png'),
               decoration: getPageDecoration(),
             ),
             PageViewModel(
-              title: 'Parking lots',
-              body: 'Find parking lots near you',
-              //image: buildImage('assets/image.png'),
+              title: 'Select the perfect parking lot',
+              body:
+                  'View more details about the carpark like lot availability, distance & historic availability',
+              image: buildImage('assets/images/info_page.png'),
+              decoration: getPageDecoration(),
+            ),
+            PageViewModel(
+              title: 'Get directions',
+              body: 'Get automatic directions to the carpark via Google Maps',
+              image: buildImage('assets/images/directions.png'),
               decoration: getPageDecoration(),
             ),
           ],
@@ -39,8 +47,11 @@ class OnBoardingPage extends StatelessWidget {
         ),
       );
 
-  void goToHome(context) => Navigator.pushNamed(context, '/multitabview');
+  void goToHome(context) =>
+      Navigator.pushReplacementNamed(context, '/multitabview');
 
+  Widget buildImage(String path) =>
+      Center(child: Image.asset(path, width: 350));
 
   PageDecoration getPageDecoration() => PageDecoration(
         titleTextStyle: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
