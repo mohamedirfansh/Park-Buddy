@@ -7,7 +7,7 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
 class CarparkAPIInterface {
-  static final dateFormat = DateFormat('yyyy-MM-ddThh%3Amm%3Ass');
+  static final dateFormat = DateFormat('yyyy-MM-ddTHH%3Amm%3Ass');
   static final jsonDateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
 
   /// Pull HDB carpark availability data for a specified date and time
