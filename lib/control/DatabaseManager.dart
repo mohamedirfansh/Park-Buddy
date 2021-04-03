@@ -101,7 +101,7 @@ class DatabaseManager {
   }
 
   // Return a list of all Carparks, sorted by date
-  static Future<List<Map>> getCarparkList(String carparkNumber) async {
+  static Future<Map> getCarparkList(String carparkNumber) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     List<Map> results = await dbClient.query(
       _table,
@@ -110,7 +110,44 @@ class DatabaseManager {
       whereArgs: [carparkNumber],
       orderBy: 'timestamp ASC',
     );
-    return results;
+    Map<String, List> dayMap = {
+      'Mon': [],
+      'Tues': [],
+      'Wed': [],
+      'Thurs': [],
+      'Fri': [],
+      'Sat': [],
+      'Sun': [],
+    };
+
+
+    results.forEach((element) {
+      DateTime entryDate = DateTime.fromMillisecondsSinceEpoch(element['timestamp']);
+      switch (entryDate.weekday) {
+        case 1:
+          dayMap['Mon'].add(element);
+          break;
+        case 2:
+          dayMap['Tues'].add(element);
+          break;
+        case 3:
+          dayMap['Wed'].add(element);
+          break;
+        case 4:
+          dayMap['Thurs'].add(element);
+          break;
+        case 5:
+          dayMap['Fri'].add(element);
+          break;
+        case 6:
+          dayMap['Sat'].add(element);
+          break;
+        case 7:
+          dayMap['Sun'].add(element);
+          break;
+      }
+    });
+    return dayMap;
   }
 
   static void printAllCarparks() async {

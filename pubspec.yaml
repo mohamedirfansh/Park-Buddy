@@ -39,7 +39,8 @@ dependencies:
   uuid: any
   sqflite: any
   shared_preferences: 0.5.12
-  fl_chart: ^0.12.3
+#  fl_chart: ^0.20.1
+  syncfusion_flutter_charts: 19.1.54+1
   map_launcher: ^1.1.3
   introduction_screen: ^1.0.9
 
