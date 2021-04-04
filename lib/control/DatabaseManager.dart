@@ -95,8 +95,7 @@ class DatabaseManager {
   static Future<int> deleteAllCarparkBefore(DateTime timeBefore) async {
     var dbClient = await AvailabilityDatabase.instance.database;
     var time = timeBefore.millisecondsSinceEpoch;
-    var query = await dbClient
-        .delete(_table, where: 'timestamp < ?', whereArgs: [time]);
+    var query = await dbClient.delete(_table, where: 'timestamp < ?', whereArgs: [time]);
     return query;
   }
 
@@ -124,6 +123,15 @@ class DatabaseManager {
     int count = Sqflite.firstIntValue(
         await dbClient.rawQuery('SELECT COUNT(*) FROM $_table'));
     (count > 0) ? print(count) : print("empty");
+  }
+
+  static Future<int> getEntries() async {
+    final dbClient = await AvailabilityDatabase.instance.database;
+
+    int count = Sqflite.firstIntValue(
+        await dbClient.rawQuery('SELECT COUNT(*) FROM $_table'));
+    (count > 0) ? print(count) : print("empty");
+    return count;
   }
 
   static Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
