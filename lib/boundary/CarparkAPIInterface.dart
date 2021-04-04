@@ -20,6 +20,8 @@ class CarparkAPIInterface {
       final list = json.decode(response.body);
       final items = list['items'][0];
       return items;
+    } else if (response.statusCode == 400) { // bad response (when testing)
+      throw BadRequestException();
     } else {
       throw Exception("Failed to retrieve Carpark API data");
     }
@@ -73,5 +75,16 @@ class CarparkAPIInterface {
     } else {
       throw Exception("Failed to retrieve Carpark API data");
     }
+  }
+}
+
+class BadRequestException implements Exception {
+  final _message;
+  final _prefix;
+
+  BadRequestException([this._message, this._prefix]);
+
+  String toString() {
+    return "$_prefix$_message";
   }
 }
