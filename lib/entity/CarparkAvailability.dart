@@ -49,7 +49,7 @@ class CarparkAvailability {
   /// factory method to create a CarparkAvailability object from a json mapping
   factory CarparkAvailability.fromJson(Map<String, dynamic> json, String timestamp) {
     final dateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
-    DateTime date = dateFormat.parse(timestamp);
+    DateTime date = dateFormat.parse(timestamp, true).subtract(Duration(hours:8));
     int totalH=0, totalC=0, totalY=0;
     int availH=0, availC=0, availY=0;
 
@@ -82,7 +82,7 @@ class CarparkAvailability {
       lotsAvailableH: availH,
       lotsAvailableC: availC,
       lotsAvailableY: availY,
-      updateDatetime: dateFormat.parse(json["update_datetime"]).millisecondsSinceEpoch,
+      updateDatetime: dateFormat.parse(json["update_datetime"]).subtract(Duration(hours:8)).millisecondsSinceEpoch,
     );
   }
 
@@ -111,7 +111,7 @@ class CarparkAvailability {
       }
     }
 
-    this.timestamp = timestamp.millisecondsSinceEpoch;
+    this.timestamp = timestamp.subtract(Duration(hours:8)).millisecondsSinceEpoch;
     this.carparkNumber = json["carpark_number"].toString();
     this.singleType = (numCarparkTypes == 1) ? 1 : 0;
     this.totalLotsH = totalH;
@@ -120,7 +120,7 @@ class CarparkAvailability {
     this.lotsAvailableH = availH;
     this.lotsAvailableC = availC;
     this.lotsAvailableY = availY;
-    this.updateDatetime = dateFormat.parse(json["update_datetime"]).millisecondsSinceEpoch;
+    this.updateDatetime = dateFormat.parse(json["update_datetime"],true).subtract(Duration(hours:8)).millisecondsSinceEpoch;
   }
   /// Converts object to a map for storage into database
   Map<String, dynamic> toMap() {
