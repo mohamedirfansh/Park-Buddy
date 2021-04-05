@@ -56,11 +56,13 @@ class PullDateManager {
         await Future.wait(pullList.map((e) =>
             DatabaseManager.pullCarparkAvailability(e,
                 insertIntoDatabase: true))); // pull async, since we don't care about the order
-      } on DatabaseException {
+      } on DatabaseException catch(e){
+          print(e);
           resetDate(); // if error during insertion, reset the pull date and do a pull from scratch the next time around
       } on BadRequestException {
         // test case exception
       } catch(e) {
+        print(e);
         throw Exception("Cannot connect to API");
       }
     }

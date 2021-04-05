@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_retry/http_retry.dart';
+//import 'package:http_retry/http_retry.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
@@ -16,15 +16,15 @@ class CarparkAPIInterface {
     String d = dateFormat.format(dateTime);
     var url =
         "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
-    var response;
-
-    final client = RetryClient(http.Client()); // retry up to 3 times before throwing cannot connect error
+    //final client = RetryClient(http.Client());
+    /*
     try {
       response = await client.read(url);
     } finally {
       client.close();
     }
-    //final response = await http.get(url);
+    */
+    final response = await http.get(url);
     if (response.statusCode == 200) {
       final list = json.decode(response.body);
       final items = list['items'][0];
