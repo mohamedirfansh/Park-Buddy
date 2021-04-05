@@ -40,7 +40,7 @@ class PullDateManager {
     final int saved = nearestHour.millisecondsSinceEpoch; // save the time so that we can storpue it later as reference
     int pulls = (difference >= _pullWindow || difference < 0) ? _pullWindow : difference; // if difference >= pullWindow, means last pull was outside the window, and we need to do a complete pull.
     if (pulls >= _pullWindow) await DatabaseManager.deleteAllCarparkBefore(now); // delete all records if need to do a complete pull
-    else await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow))); // delete all records outside the window otherwise
+    else await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow)).add(Duration(minutes: 15))); // delete all records outside the window otherwise
     List<DateTime> pullList = new List<DateTime>();
     if (pulls > 0) {
       pullList.add(nearestHour);
