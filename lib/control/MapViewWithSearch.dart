@@ -91,22 +91,26 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
 
   FutureBuilder<List<Suggestion>> _autocompleteSuggestionBuilder(
       BuildContext context) {
-    return FutureBuilder(
-      future: apiClient.fetchSuggestions(
-          currentQuery, Localizations.localeOf(context).languageCode),
-      builder: (context, snapshot) {
-        if (currentQuery == '') {
-          return _preSearchWidget();
-        }
-        if (snapshot.hasData == false) {
-          return _searchLoadingWidget();
-        } else if (snapshot.data.length > 0) {
-          return _suggestionListViewWidget(snapshot);
-        } else {
-          return _emptyResultsWidget();
-        }
-      },
-    );
+      return FutureBuilder(
+        future: apiClient.fetchSuggestions(
+            currentQuery, Localizations
+            .localeOf(context)
+            .languageCode),
+        builder: (context, snapshot) {
+          if (currentQuery == '') {
+            return _preSearchWidget();
+          }
+          if (snapshot.hasData == false) {
+            if (snapshot.connectionState == ConnectionState.done && snapshot.hasError)
+              return _errorResultsWidget();
+            return _searchLoadingWidget();
+          } else if (snapshot.data.length > 0) {
+            return _suggestionListViewWidget(snapshot);
+          } else {
+            return _emptyResultsWidget();
+          }
+        },
+      );
   }
 
   Widget _preSearchWidget() {
@@ -170,6 +174,17 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
       padding: EdgeInsets.all(16.0),
       child: Center(
         child: Text('No results found.'),
+      ),
+      color: Colors.white,
+      constraints: BoxConstraints.expand(width: 380, height: 50),
+    );
+  }
+
+  Widget _errorResultsWidget() {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      child: Center(
+        child: Text('Unable to connect to the server. Please try again.'),
       ),
       color: Colors.white,
       constraints: BoxConstraints.expand(width: 380, height: 50),
