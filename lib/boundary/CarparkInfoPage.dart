@@ -7,7 +7,7 @@ import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
-import 'package:park_buddy/Histogram.dart';
+import 'package:park_buddy/entity/Histogram.dart';
 
 class CarparkInfoPage extends StatefulWidget {
   final String carparkCode;
@@ -62,15 +62,12 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
             Card(
                 elevation: 4,
                 margin: EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 0),
+
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                 ),
-                child: Column(
-                  children: [
-                    Text("Carpark History", style: TextStyle(fontSize: 15)),
-                    Histogram(),
-                  ],
-                )),
+                child: _carparkHistorySection(carparkCode)
+              ),
             Card(
                 elevation: 4,
                 margin: EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 0),
@@ -78,7 +75,7 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
                   borderRadius: BorderRadius.circular(15.0),
                 ),
                 child: ListTile(
-                  leading: ImageIcon(AssetImage("assets/images/Google_Maps_Icon.png")
+                  leading: ImageIcon(AssetImage("assets/images/Google_Maps_Icon.png"),
                   ),
                   title: Text("Get directions with Google Maps"),
                   onTap: () => goToGoogleMaps(carpark),
@@ -114,6 +111,10 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
         ],
       ),
     );
+  }
+
+  Widget _carparkHistorySection(String carparkCode) {
+    return Histogram(carparkCode);
   }
 
   Widget _carparkAvailabilityInfoSection(

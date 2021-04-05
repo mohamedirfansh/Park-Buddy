@@ -100,7 +100,7 @@ class DatabaseManager {
   }
 
   // Return a list of all Carparks, sorted by date
-  static Future<List<Map>> getCarparkList(String carparkNumber) async {
+  static Future<Map> getCarparkList(String carparkNumber) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     List<Map> results = await dbClient.query(
       _table,
@@ -109,7 +109,65 @@ class DatabaseManager {
       whereArgs: [carparkNumber],
       orderBy: 'timestamp ASC',
     );
-    return results;
+    List<CarparkAvailability> convertedResult = [];
+    results.forEach((element) {
+      CarparkAvailability carpark = CarparkAvailability(
+          carparkNumber: element['carparkNumber'],
+          timestamp: element['timestamp'],
+          updateDatetime: element['updateDatetime'],
+          singleType: element['singleType'],
+          totalLotsH: element['totalLotsH'],
+          totalLotsC: element['totalLotsC'],
+          totalLotsY: element['totalLotsY'],
+          lotsAvailableH: element['lotsAvailableH'],
+          lotsAvailableC: element['lotsAvailableC'],
+          lotsAvailableY: element['lotsAvailableY']
+      );
+      convertedResult.add(carpark);
+    });
+
+
+    Map<String, List> dayMap = {
+      'Mon': [],
+      'Tues': [],
+      'Wed': [],
+      'Thurs': [],
+      'Fri': [],
+      'Sat': [],
+      'Sun': [],
+    };
+
+
+    convertedResult.forEach((element) {
+      DateTime entryDate = DateTime.fromMillisecondsSinceEpoch(element.timestamp);
+      switch (entryDate.weekday) {
+        case 1:
+          dayMap['Mon'].add(element);
+          break;
+        case 2:
+          dayMap['Tues'].add(element);
+          break;
+        case 3:
+          dayMap['Wed'].add(element);
+          break;
+        case 4:
+          dayMap['Thurs'].add(element);
+          break;
+        case 5:
+          dayMap['Fri'].add(element);
+          break;
+        case 6:
+          dayMap['Sat'].add(element);
+          break;
+        case 7:
+          dayMap['Sun'].add(element);
+          break;
+      }
+    });
+    dayMap.forEach((key, value) {
+      value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    });
+    return dayMap;
   }
 
   static void printAllCarparks() async {
