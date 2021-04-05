@@ -105,7 +105,6 @@ class _HistogramState extends State<Histogram> {
                     minorGridLines: MinorGridLines(
                         width: 0
                     ),
-                    labelRotation: 5,
                 ),
                 backgroundColor: Colors.transparent,
                 plotAreaBackgroundColor: Colors.transparent,
