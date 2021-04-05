@@ -50,6 +50,17 @@ class _HistogramState extends State<Histogram> {
                     yValueMapper: (dynamic carpark, _) {
                       return 100*(carpark.lotsAvailableC/carpark.totalLotsC);
                     },
+                    pointColorMapper: (dynamic carpark, _) {
+                      var fraction = carpark.lotsAvailableC/carpark.totalLotsC;
+                      if (fraction < 0.3) {
+                        return Colors.red;
+                      } else if ( fraction < 0.5)
+                      {
+                        return Colors.deepOrange;
+                      } else if (fraction < 0.7) {
+                        return Colors.amber;
+                      } else return Colors.green;
+                    },
                     width: 0.8, // Width of the columns
                     // animationDuration: 1000,// Spacing between the column
                   )
@@ -82,7 +93,7 @@ class _HistogramState extends State<Histogram> {
                         textStyle: TextStyle(color: Colors.black, fontSize: 16),
                         borderWidth: 2,
                         textAngle: 0,
-                        borderColor: Colors.redAccent
+                        borderColor: Colors.lightBlue
                       )
                     ]
                 ),
@@ -94,6 +105,7 @@ class _HistogramState extends State<Histogram> {
                     minorGridLines: MinorGridLines(
                         width: 0
                     ),
+                    labelRotation: 5,
                 ),
                 backgroundColor: Colors.transparent,
                 plotAreaBackgroundColor: Colors.transparent,
