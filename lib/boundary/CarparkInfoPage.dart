@@ -26,7 +26,6 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
   final String carparkCode;
   final LocationData currentLocation;
   final CarparkAvailability carparkAvailability;
-  String selectedDay = 'Mon';
 
   double getDistance(double carparkLat, double carparkLong) {
     final double distance = Geodesy().distanceBetweenTwoGeoPoints(LatLng(carparkLat, carparkLong), LatLng(currentLocation.latitude, currentLocation.longitude));
@@ -114,22 +113,8 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
     );
   }
 
-  Widget _carparkHistorySection(carparkCode) {
-    return Column(
-        children: [
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-             children: [
-               Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-               dropdownMenu(),
-             ],
-            )
-
-           ),
-           Histogram(carparkCode),
-        ],
-    );
+  Widget _carparkHistorySection(String carparkCode) {
+    return Histogram(carparkCode);
   }
 
   Widget _carparkAvailabilityInfoSection(
@@ -196,32 +181,6 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
     await availableMaps.first.showDirections(
       destinationTitle: info.address,
       destination: Coords(info.latlng.latitude, info.latlng.longitude),
-    );
-  }
-
-  Widget dropdownMenu() {
-    return DropdownButton<String>(
-        value: selectedDay,
-        icon: const Icon(Icons.arrow_downward),
-        iconSize: 24,
-        elevation: 16,
-        style: const TextStyle(color: Colors.deepPurple),
-        underline: Container(
-          height: 2,
-          color: Colors.deepPurpleAccent,
-        ),
-        onChanged: (String newValue) {
-          setState(() {
-            selectedDay = newValue;
-          });
-        },
-    items: <String>['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
-        .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value)
-                  );
-        }).toList(),
     );
   }
 }

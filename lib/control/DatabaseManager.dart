@@ -110,6 +110,24 @@ class DatabaseManager {
       whereArgs: [carparkNumber],
       orderBy: 'timestamp ASC',
     );
+    List<CarparkAvailability> convertedResult = [];
+    results.forEach((element) {
+      CarparkAvailability carpark = CarparkAvailability(
+          carparkNumber: element['carparkNumber'],
+          timestamp: element['timestamp'],
+          updateDatetime: element['updateDatetime'],
+          singleType: element['singleType'],
+          totalLotsH: element['totalLotsH'],
+          totalLotsC: element['totalLotsC'],
+          totalLotsY: element['totalLotsY'],
+          lotsAvailableH: element['lotsAvailableH'],
+          lotsAvailableC: element['lotsAvailableC'],
+          lotsAvailableY: element['lotsAvailableY']
+      );
+      convertedResult.add(carpark);
+    });
+
+
     Map<String, List> dayMap = {
       'Mon': [],
       'Tues': [],
@@ -121,8 +139,8 @@ class DatabaseManager {
     };
 
 
-    results.forEach((element) {
-      DateTime entryDate = DateTime.fromMillisecondsSinceEpoch(element['timestamp']);
+    convertedResult.forEach((element) {
+      DateTime entryDate = DateTime.fromMillisecondsSinceEpoch(element.timestamp);
       switch (entryDate.weekday) {
         case 1:
           dayMap['Mon'].add(element);
@@ -146,6 +164,9 @@ class DatabaseManager {
           dayMap['Sun'].add(element);
           break;
       }
+    });
+    dayMap.forEach((key, value) {
+      value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     });
     return dayMap;
   }
