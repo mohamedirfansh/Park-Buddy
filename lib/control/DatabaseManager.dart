@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:sqflite/sqflite.dart';
+import 'package:semaphore/semaphore.dart';
 
 import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:park_buddy/entity/AvailabilityDatabase.dart';
@@ -7,12 +8,17 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 class DatabaseManager {
   static final _table = "AvailabilityTable";
+  static final sm = LocalSemaphore(30);
 
   /// Pull Carpark Availability API an convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date,
       {bool insertIntoDatabase = false}) async {
-    var items = await CarparkAPIInterface.getCarparkMap(date);
-    return await _availabilityFromJson(items, insertIntoDatabase);
+    try {
+      var items = await CarparkAPIInterface.getCarparkMap(date);
+      return await _availabilityFromJson(items, insertIntoDatabase);
+    } catch(e) {
+      print("cannot connect");
+    }
   }
 
   /// private method to convert retrieved carpark availability json into CarparkAvailability object
@@ -128,39 +134,27 @@ class DatabaseManager {
 
 
     Map<String, List> dayMap = {
-      'Mon': [],
-      'Tues': [],
-      'Wed': [],
-      'Thurs': [],
-      'Fri': [],
-      'Sat': [],
-      'Sun': [],
+      'Today': [],
+      '1 Day Ago': [],
+      '2 Days Ago': [],
     };
 
 
     convertedResult.forEach((element) {
+      DateTime now = DateTime.now().toUtc().add(Duration(hours:8));
+      now = DateTime(now.year,now.month,now.day);
       DateTime entryDate = DateTime.fromMillisecondsSinceEpoch(element.timestamp);
-      switch (entryDate.weekday) {
+      entryDate = DateTime(entryDate.year,entryDate.month,entryDate.day);
+      final difference = now.difference(entryDate).inDays;
+      switch (difference) {
+        case 0:
+          dayMap['Today'].add(element);
+          break;
         case 1:
-          dayMap['Mon'].add(element);
+          dayMap['1 Day Ago'].add(element);
           break;
         case 2:
-          dayMap['Tues'].add(element);
-          break;
-        case 3:
-          dayMap['Wed'].add(element);
-          break;
-        case 4:
-          dayMap['Thurs'].add(element);
-          break;
-        case 5:
-          dayMap['Fri'].add(element);
-          break;
-        case 6:
-          dayMap['Sat'].add(element);
-          break;
-        case 7:
-          dayMap['Sun'].add(element);
+          dayMap['2 Days Ago'].add(element);
           break;
       }
     });
@@ -191,7 +185,7 @@ class DatabaseManager {
     (count > 0) ? print(count) : print("empty");
     return count;
   }
-
+  static int count = 0;
   static Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     final batch = dbClient.batch();
@@ -202,17 +196,23 @@ class DatabaseManager {
         batch.insert(_table, carparks[i].toMap());
       }
     }
-    await batch.commit(noResult: true);
+    try {
+      await sm.acquire();
+      await batch.commit(noResult: true);
+      print("commited $count");
+      count++;
+    } finally {
+      sm.release();
+    }
   }
 
   static Future checkWindow(DateTime start, DateTime end) async {
     int startEpoch = start.millisecondsSinceEpoch;
     int endEpoch = end.millisecondsSinceEpoch;
     final dbClient = await AvailabilityDatabase.instance.database;
-
-    var count = await dbClient.rawQuery(
-        'SELECT COUNT(*) FROM $_table WHERE timestamp >= $startEpoch AND timestamp <= $endEpoch');
-    print(Sqflite.firstIntValue(count));
+      var count = await dbClient.rawQuery(
+          'SELECT COUNT(*) FROM $_table WHERE timestamp >= $startEpoch AND timestamp <= $endEpoch');
+      print(Sqflite.firstIntValue(count));
   }
 }
 
