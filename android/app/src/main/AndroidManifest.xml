@@ -7,7 +7,7 @@
         android:label="Park Buddy"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyADIURqATNY0BQCsoLLjEbvUtmEcD1kXXA"/>
+            android:value="AIzaSyDOKKYsw8gdVg_g4Brsq_cjgvldSE0Jys4"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
