@@ -15,7 +15,7 @@ class Histogram extends StatefulWidget {
 class _HistogramState extends State<Histogram> {
   _HistogramState(this.carparkCode);
   final carparkCode;
-  String selectedDay = 'Mon';
+  String selectedDay = _getCurrentDayFromDateTime();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -105,7 +105,6 @@ class _HistogramState extends State<Histogram> {
                     minorGridLines: MinorGridLines(
                         width: 0
                     ),
-                    labelRotation: 5,
                 ),
                 backgroundColor: Colors.transparent,
                 plotAreaBackgroundColor: Colors.transparent,
@@ -180,4 +179,33 @@ class _HistogramState extends State<Histogram> {
     }
     return data;
   }
+
+  static String _getCurrentDayFromDateTime() {
+    switch (DateTime.now().weekday) {
+      case 1:
+        return 'Mon';
+        break;
+      case 2:
+        return 'Tues';
+        break;
+      case 3:
+        return 'Wed';
+        break;
+      case 4:
+        return 'Thurs';
+        break;
+      case 5:
+        return 'Fri';
+        break;
+      case 6:
+        return 'Sat';
+        break;
+      case 7:
+        return 'Sun';
+        break;
+    }
+
+    return 'Mon';
+  }
+
 }
