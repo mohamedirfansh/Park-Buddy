@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:park_buddy/control/DatabaseManager.dart';
 import 'package:park_buddy/control/PullDateManager.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
@@ -15,7 +16,7 @@ class Histogram extends StatefulWidget {
 class _HistogramState extends State<Histogram> {
   _HistogramState(this.carparkCode);
   final carparkCode;
-  String selectedDay = _getCurrentDayFromDateTime();
+  String selectedDay = 'Today';
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -35,6 +36,9 @@ class _HistogramState extends State<Histogram> {
   }
 
   Widget _histogram() {
+    int day = 0;
+    int month = 0;
+    int year = 0;
     return FutureBuilder(
         future: _getHistogramData(carparkCode),
         builder: (context, snapshot) {
@@ -45,7 +49,11 @@ class _HistogramState extends State<Histogram> {
                   ColumnSeries<dynamic, DateTime>(
                     dataSource: snapshot.data[selectedDay],
                     xValueMapper: (dynamic carpark, _) {
-                      return DateTime.fromMillisecondsSinceEpoch(carpark.timestamp);
+                      DateTime val = DateTime.fromMillisecondsSinceEpoch(carpark.timestamp);
+                      day = val.day;
+                      month = val.month;
+                      year = val.year;
+                      return val;
                     },
                     yValueMapper: (dynamic carpark, _) {
                       return 100*(carpark.lotsAvailableC/carpark.totalLotsC);
@@ -66,12 +74,16 @@ class _HistogramState extends State<Histogram> {
                   )
                 ],
                 primaryXAxis: DateTimeAxis(
+                  minimum:DateTime(year,month,day,0),
+                  maximum:DateTime(year,month,day,24),
+
                   majorGridLines: MajorGridLines(
                       width: 0,
                   ),
                   minorGridLines: MinorGridLines(
                       width: 0
                   ),
+                    /*
                     plotBands: <PlotBand>[
                       PlotBand(
                         isVisible: true,
@@ -95,23 +107,29 @@ class _HistogramState extends State<Histogram> {
                         textAngle: 0,
                         borderColor: Colors.lightBlue
                       )
+
                     ]
+
+                     */
                 ),
                 primaryYAxis: NumericAxis(
-                    labelFormat: '{value}% empty',
-                    majorGridLines: MajorGridLines(
-                      width: 0,
-                    ),
-                    minorGridLines: MinorGridLines(
-                        width: 0
-                    ),
+                  labelFormat: '{value}% empty',
+                  majorGridLines: MajorGridLines(
+                    width: 0,
+                  ),
+                  minorGridLines: MinorGridLines(
+                      width: 0
+                  ),
                 ),
                 backgroundColor: Colors.transparent,
                 plotAreaBackgroundColor: Colors.transparent,
 
               ),
             );
-          } else return Container(child: Text("Loading"),);
+          } else return Container(child: SpinKitRing(
+            color: Colors.cyan[300],
+            size: 50.0,
+          ),);
         }
     );
   }
@@ -132,7 +150,7 @@ class _HistogramState extends State<Histogram> {
           selectedDay = newValue;
         });
       },
-      items: <String>['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
+      items: <String>['Today', '1 Day Ago', '2 Days Ago']
           .map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
             value: value,
@@ -143,69 +161,33 @@ class _HistogramState extends State<Histogram> {
   }
 
   List<dynamic> _filterCarparkAvailability(List<dynamic> carparkList) {
-    carparkList.forEach( (carpark) {
+    /*carparkList.forEach( (carpark) {
+      /*
         if (carpark.timestamp < DateTime.now().millisecondsSinceEpoch - Duration(days: 1).inMilliseconds){
           carpark.timestamp += Duration(days: 7).inMilliseconds;
         }
-    });
+        */
+    });*/
     return carparkList;
   }
 
   Future _getHistogramData(String carparkCode) async {
     await PullDateManager.pullMissingDates();
+
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
+    /*
     switch (DateTime.now().weekday) {
       case 1:
-        data['Mon'] = _filterCarparkAvailability(data['Mon']);
+        data['Today'] = _filterCarparkAvailability(data['Today']);
         break;
       case 2:
-        data['Tues'] = _filterCarparkAvailability(data['Tues']);
+        data['1 Day Ago'] = _filterCarparkAvailability(data['1 Day Ago']);
         break;
       case 3:
-        data['Wed'] = _filterCarparkAvailability(data['Wed']);
-        break;
-      case 4:
-        data['Thurs'] = _filterCarparkAvailability(data['Thurs']);
-        break;
-      case 5:
-        data['Fri'] = _filterCarparkAvailability(data['Fri']);
-        break;
-      case 6:
-        data['Sat'] = _filterCarparkAvailability(data['Sat']);
-        break;
-      case 7:
-        data['Sun'] = _filterCarparkAvailability(data['Sun']);
+        data['2 Days Ago'] = _filterCarparkAvailability(data['2 Days Ago']);
         break;
     }
+    */
     return data;
   }
-
-  static String _getCurrentDayFromDateTime() {
-    switch (DateTime.now().weekday) {
-      case 1:
-        return 'Mon';
-        break;
-      case 2:
-        return 'Tues';
-        break;
-      case 3:
-        return 'Wed';
-        break;
-      case 4:
-        return 'Thurs';
-        break;
-      case 5:
-        return 'Fri';
-        break;
-      case 6:
-        return 'Sat';
-        break;
-      case 7:
-        return 'Sun';
-        break;
-    }
-
-    return 'Mon';
-  }
-
 }
