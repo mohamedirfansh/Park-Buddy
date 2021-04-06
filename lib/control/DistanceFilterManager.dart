@@ -7,21 +7,25 @@ typedef void DistCallBack(double dist);
 class DistFilterManager extends StatefulWidget {
   @override
   _DistFilterManagerState createState() => _DistFilterManagerState();
+  // Form values
+  static double _chosenDistance = 0.5;
+
+  static double chosenDist() {
+    return _chosenDistance;
+  }
+
+  static double setDist(double val) {
+    _chosenDistance = val;
+  }
+
 }
 
 class _DistFilterManagerState extends State<DistFilterManager> {
   final _formKey = GlobalKey<FormState>();
   final List<double> distance = [0.5, 1.0, 2.0, 5.0, 10.0];
-
+  double _selectedDist = 0.5;
   // final DistCallBack updateDist;
   // _DistFilterManagerState(this.updateDist);
-
-  // Form values
-  double _chosenDistance = 0.5;
-
-  double chosenDist() {
-    return _chosenDistance;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +42,7 @@ class _DistFilterManagerState extends State<DistFilterManager> {
           ),
           DropdownButtonFormField(
               //decoration:
-              value: _chosenDistance ?? 0.5,
+              value: DistFilterManager.chosenDist() ?? 0.5,
               items: distance.map((d) {
                 return DropdownMenuItem(
                   value: d,
@@ -47,8 +51,9 @@ class _DistFilterManagerState extends State<DistFilterManager> {
               }).toList(),
               onChanged: (val) {
                 setState(() {
-                  _chosenDistance = val;
-                  print(_chosenDistance);
+                  //DistFilterManager.setDist(val);
+                  _selectedDist = val;
+                  print(_selectedDist);
                 });
               }),
           SizedBox(
@@ -63,9 +68,10 @@ class _DistFilterManagerState extends State<DistFilterManager> {
             onPressed: () {
               if (_formKey.currentState.validate()) {
                 //updateDist(_chosenDistance);
-                CarparkListView.of(context).distance = 0.7;
-                print(_chosenDistance);
-                //Navigator.pop(context);
+                //CarparkListView.of(context).distance = 0.7;
+                DistFilterManager.setDist(_selectedDist);
+                print(DistFilterManager.chosenDist());
+                Navigator.pop(context);
               }
             },
           )

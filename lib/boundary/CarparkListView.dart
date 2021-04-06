@@ -18,10 +18,21 @@ class CarparkListView extends StatefulWidget {
 
   static _CarparkListViewState of(BuildContext context) =>
       context.findAncestorStateOfType<_CarparkListViewState>();
+
+  static double _chosenDist = 0.5;
+
+  static set distance(double val) {
+    _chosenDist = val;
+  }
+
+  static get distance {
+    return _chosenDist;
+  }
 }
 
 class _CarparkListViewState extends State<CarparkListView> {
   LocationData currentLocation;
+  /*
   double _chosenDist = 0.5;
 
   set distance(double val) {
@@ -29,6 +40,7 @@ class _CarparkListViewState extends State<CarparkListView> {
       _chosenDist = val;
     });
   }
+  */
 
   Future<LocationData> getUserLocation() async {
     if (LocationManager.locationModeSelf) {
@@ -48,6 +60,12 @@ class _CarparkListViewState extends State<CarparkListView> {
               child: DistFilterManager(),
             );
           });
+
+      setState(() {
+        //_chosenDist = DistFilterManager.chosenDist();
+        CarparkListView.distance = DistFilterManager.chosenDist();
+      });
+
     }
 
     return Scaffold(
@@ -74,7 +92,7 @@ class _CarparkListViewState extends State<CarparkListView> {
             } else if (snapshot.hasError) {
               return _loadingWidget(true);
             } else if (snapshot.hasData && snapshot.data != null) {
-              return CarparkListManager(_chosenDist)
+              return CarparkListManager(CarparkListView.distance)
                   .constructList(snapshot.data);
             } else {
               //Error
