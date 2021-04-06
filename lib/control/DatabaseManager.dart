@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:semaphore/semaphore.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
@@ -7,7 +8,7 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 class DatabaseManager {
   static final _table = "AvailabilityTable";
-
+  static final sm = LocalSemaphore(40);
   /// Pull Carpark Availability API an convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date,
       {bool insertIntoDatabase = false}) async {
@@ -192,6 +193,7 @@ class DatabaseManager {
     return count;
   }
 
+  //static int count = 0;
   static Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     final batch = dbClient.batch();
@@ -202,7 +204,14 @@ class DatabaseManager {
         batch.insert(_table, carparks[i].toMap());
       }
     }
-    await batch.commit(noResult: true);
+    try {
+      await sm.acquire();
+      await batch.commit(noResult: true);
+      //print("commited $count");
+      //count++;
+    } finally {
+      sm.release();
+    }
   }
 
   static Future checkWindow(DateTime start, DateTime end) async {
