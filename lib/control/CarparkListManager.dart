@@ -37,9 +37,12 @@ class CarparkListManager {
         } else if (snapshot.hasData && snapshot.hasError) {
           return _loadingWidget(true);
         } else if (snapshot.hasData && snapshot.data != null) {
-          return _carparkListBuilder(carparks, snapshot.data);
-        } else if (snapshot.data == null) {
-          return _noCarparkWidget();
+          return _carparkListBuilder(carparks, snapshot.data, false);
+        } else if (snapshot.data == null && snapshot.hasError) {
+          return _errorListBuilder(carparks, snapshot.data, true);
+    //return _noCarparkWidget();
+        } else if (snapshot.data == null && !snapshot.hasError) {
+            return _noCarparkWidget();
         } else {
           //Error
           return Container(child: Text("Error"));
@@ -49,12 +52,22 @@ class CarparkListManager {
   }
 
   Widget _carparkListBuilder(List<CarparkInfo> carparks,
-      Map<String, CarparkAvailability> carparkAvailMap) {
+      Map<String, CarparkAvailability> carparkAvailMap, bool hasError) {
     return ListView.builder(
         itemCount: carparks.length,
         itemBuilder: (context, index) {
           return CarparkCard(
-              carparks[index], carparkAvailMap[carparks[index].carparkCode]);
+              carparks[index], carparkAvailMap[carparks[index].carparkCode], hasError);
+        });
+  }
+
+  Widget _errorListBuilder(List<CarparkInfo> carparks,
+      Map<String, CarparkAvailability> carparkAvailMap, bool hasError) {
+    return ListView.builder(
+        itemCount: carparks.length,
+        itemBuilder: (context, index) {
+          return CarparkCard(
+              carparks[index], null, hasError);
         });
   }
 

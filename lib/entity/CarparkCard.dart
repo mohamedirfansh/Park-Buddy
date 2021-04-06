@@ -7,11 +7,12 @@ import 'package:park_buddy/entity/CarparkInfo.dart';
 class CarparkCard extends StatelessWidget {
   final CarparkInfo carpark;
   final CarparkAvailability carparkAvailability;
-  CarparkCard(this.carpark, this.carparkAvailability);
+  bool hasError = false;
+  CarparkCard(this.carpark, this.carparkAvailability, this.hasError);
 
   @override
   Widget build(BuildContext context) {
-    if (carparkAvailability != null) {
+    if (carparkAvailability != null && !hasError) {
       return Container(
         height: 100,
         padding: EdgeInsets.only(top: 8.0),
@@ -41,6 +42,8 @@ class CarparkCard extends StatelessWidget {
           ),
         ),
       );
+    } else if (hasError) {
+      return _errorCard(context);
     }
     return _missingAvailabilityCard();
   }
@@ -71,6 +74,38 @@ class CarparkCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _errorCard(var context){
+    return Container(
+      height: 100,
+      padding: EdgeInsets.only(top: 8.0),
+      child: Card(
+        elevation: 2,
+        margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
+        child: ListTile(
+          leading: CircleAvatar(
+            radius: 25.0,
+            backgroundImage: AssetImage('assets/images/parking-icon.png'),
+          ),
+          title: Text(carpark.carparkCode),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                carpark.address,
+                style: TextStyle(fontSize: 15.0),
+              ),
+              Text(
+                "Lot Availability Unavailable",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          onTap: () => ScreenManager.openDynamicInfoPage(context, carpark.carparkCode, carparkAvailability),
         ),
       ),
     );
