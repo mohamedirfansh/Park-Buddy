@@ -27,7 +27,6 @@ class PlaceApiProvider {
     final request =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&language=$lang&components=country:sg&key=$apiKey&sessiontoken=$sessionToken';
     final response = await client.get(request);
-
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       if (result['status'] == 'OK') {
@@ -40,7 +39,7 @@ class PlaceApiProvider {
         print("no results");
         return [];
       }
-      //throw Exception(result['error_message']);
+      throw Exception(result['error_message']);
     } else {
       throw Exception('Failed to fetch suggestion');
     }

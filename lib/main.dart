@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/control/ScreenManager.dart';
-
 import 'package:park_buddy/boundary/OnBoardingPage.dart';
 
 void main() async {

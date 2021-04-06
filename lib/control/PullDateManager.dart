@@ -1,11 +1,13 @@
+import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'DatabaseManager.dart';
 
 /// Handles the logic to pull dates that are missing from the database and delete dates that are outside the window.
 class PullDateManager {
   /// Defines the timeframe that we maintain the historical data for. (i.e. pullWindow = 24; historical data for the past 24 hours will be maintained.)
-  static final int _pullWindow = 7*24; // 1 day
+  static final int _pullWindow = 7*24; // 1 week
 
   static Future<int> getDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -23,7 +25,7 @@ class PullDateManager {
     prefs.setInt('date', 0);
   }
 
-  static pullMissingDates() async {
+  static Future<int> pullMissingDates() async {
     int lastDate = await getDate();
 
     final DateTime now = new DateTime.now().toUtc().add(Duration(hours:8)); // convert to SGT
@@ -33,18 +35,12 @@ class PullDateManager {
     DateTime nearestHour = DateTime.fromMillisecondsSinceEpoch(now.millisecondsSinceEpoch - now.millisecondsSinceEpoch % delta.inMilliseconds);
     if (nearestHour.minute == 0)
       nearestHour = nearestHour.subtract(Duration(minutes:30));
-    final int difference = nearestHour.difference(date).inHours; // get the difference between current time and last recorded date.
+    int difference = nearestHour.difference(date).inMinutes; // get the difference between current time and last recorded date.
+    difference = (difference/60).ceil();
     final int saved = nearestHour.millisecondsSinceEpoch; // save the time so that we can storpue it later as reference
-
-    int pulls = (difference > _pullWindow) ? _pullWindow : difference; // if difference > pullWindow, means last pull was outside the window, and we need to do a complete pull.
+    int pulls = (difference >= _pullWindow || difference < 0) ? _pullWindow : difference; // if difference >= pullWindow, means last pull was outside the window, and we need to do a complete pull.
     if (pulls >= _pullWindow) await DatabaseManager.deleteAllCarparkBefore(now); // delete all records if need to do a complete pull
-    else await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow))); // delete all records outside the window otherwise
-    /*
-    for (int i=0;i<pulls;i++) {
-      DatabaseManager.pullCarparkAvailability(nearestHour, insertIntoDatabase: true);
-      nearestHour = nearestHour.subtract(Duration(hours: 1));
-    }
-     */
+    else await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow)).add(Duration(minutes: 15))); // delete all records outside the window otherwise
     List<DateTime> pullList = new List<DateTime>();
     if (pulls > 0) {
       pullList.add(nearestHour);
@@ -60,10 +56,17 @@ class PullDateManager {
         await Future.wait(pullList.map((e) =>
             DatabaseManager.pullCarparkAvailability(e,
                 insertIntoDatabase: true))); // pull async, since we don't care about the order
-      } catch (DatabaseException) {
-        resetDate(); // if error during insertion, reset the pull date and do a pull from scratch the next time around.
+      } on DatabaseException catch(e){
+          print(e);
+          resetDate(); // if error during insertion, reset the pull date and do a pull from scratch the next time around
+      } on BadRequestException {
+        // test case exception
+      } catch(e) {
+        print(e);
+        throw Exception("Cannot connect to API");
       }
     }
     saveDate(saved);
+    return pulls;
   }
 }
