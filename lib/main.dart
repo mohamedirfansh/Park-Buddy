@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFF06E2B3),
       ),
       onGenerateRoute: ScreenManager.generateRoute,
-//TODO: tutorial
     );
   }
 }

@@ -184,5 +184,3 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
     );
   }
 }
-
-//TODO: histogram (queried on demand, show current time data)

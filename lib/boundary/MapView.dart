@@ -43,6 +43,22 @@ class MapViewState extends State<MapView> {
     setState(() {
       _markers.clear();
       _fillDataToMarkers(_markers, list);
+      if (list.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('No HDB carparks found in this area!', textAlign: TextAlign.center),
+            duration: const Duration(milliseconds: 3000),
+            width: 260.0, // Width of the SnackBar.
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0, // Inner padding for SnackBar content.
+            ),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+        );
+      }
     });
   }
 
@@ -74,11 +90,6 @@ class MapViewState extends State<MapView> {
         zoomControlsEnabled: false,
       ),
       extendBodyBehindAppBar: true,
-
-      //TODO: parking lot list
-      //         //TODO: connect each entry to carpark info page (same widget as map view)
-      //           // TODO: onpress/ontap: Navigator.pushNamed(context, '/carparkinfopage', arguments ['HB12']);
-
       floatingActionButton: FloatingActionButton(
         onPressed: _zoomToCurrentLocation,
         child: Icon(Icons.location_on),
@@ -99,8 +110,6 @@ class MapViewState extends State<MapView> {
         infoWindow: InfoWindow(
           title: carpark.address,
           snippet: _formatCarparkInformationForMarker(carpark),
-          //TODO: UI for lot availability
-          //TODO: backend for querying carpark API (able to query anyR
           onTap: () => ScreenManager.openDynamicInfoPage(context, carpark.carparkCode, null),
         ),
       );
@@ -141,8 +150,7 @@ class MapViewState extends State<MapView> {
       CameraPosition(
         bearing: 0,
         target: LatLng(location.latitude, location.longitude),
-        zoom:
-            15, //15 displays all carparks in 500m radius. //TODO: to change this default value if we add radius slider
+        zoom: 15, //displays all car parks in 500m radius.
       ),
     ));
   }
