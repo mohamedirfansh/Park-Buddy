@@ -7,6 +7,7 @@ import 'package:location/location.dart';
 import 'package:park_buddy/control/CarparkListManager.dart';
 import 'package:park_buddy/control/LocationManager.dart';
 
+///This view displays all the carparks that the user has searched for in a neat list view.
 class CarparkListView extends StatefulWidget {
   @override
   _CarparkListViewState createState() => _CarparkListViewState();
@@ -15,6 +16,8 @@ class CarparkListView extends StatefulWidget {
 class _CarparkListViewState extends State<CarparkListView> {
   LocationData currentLocation;
 
+  ///Gets the user's location. This can be either the user's own location, or the user's intended location,
+  /// depending on whether they searched for a destination, or used the recentre button on the map view.
   Future<LocationData> getUserLocation() async {
     if (LocationManager.locationModeSelf) {
       return await LocationManager.currentLocation;
@@ -23,6 +26,9 @@ class _CarparkListViewState extends State<CarparkListView> {
     }
   }
 
+  ///Returns a Future-dependent widget. After checking the user location, we return appropriate widgets based on the Future state.
+  /// If the Future is not completed, we show a loading widget.
+  /// If not, we call CarparkListManager to construct the list of carparks for us.
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: getUserLocation(),
@@ -40,6 +46,7 @@ class _CarparkListViewState extends State<CarparkListView> {
     );
   }
 
+  ///A simple loading widget with a spinning ring to show loading.
   Widget _loadingWidget(bool error) {
     return Container(
       color: Colors.white,
