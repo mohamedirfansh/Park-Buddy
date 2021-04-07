@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:park_buddy/control/DatabaseManager.dart';
 import 'package:park_buddy/control/PullDateManager.dart';
-import 'package:park_buddy/entity/CarparkAvailability.dart';
+import 'package:semaphore/semaphore.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -16,6 +16,7 @@ class Histogram extends StatefulWidget {
 class _HistogramState extends State<Histogram> {
   _HistogramState(this.carparkCode);
   final carparkCode;
+  static final _sm = LocalSemaphore(1);
   String selectedDay = _getCurrentDayFromDateTime();
   @override
   Widget build(BuildContext context) {
@@ -124,21 +125,22 @@ class _HistogramState extends State<Histogram> {
   }
 
   List<PlotBand> insertCurrentTimePlotBand(String selectedDay){
+    DateTime now = DateTime.now().toUtc().add(Duration(hours:8));
     if (selectedDay == _getCurrentDayFromDateTime()) {
       return [
         PlotBand(
             isVisible: true,
             start: DateTime(
-                DateTime.now().year,
-                DateTime.now().month,
-                DateTime.now().day,
-                DateTime.now().hour
+                now.year,
+                now.month,
+                now.day,
+                now.hour
             ),
             end: DateTime(
-                DateTime.now().year,
-                DateTime.now().month,
-                DateTime.now().day,
-                DateTime.now().hour
+                now.year,
+                now.month,
+                now.day,
+                now.hour
             ),
             text: 'Current time',
             verticalTextPadding:'40%',
@@ -156,7 +158,7 @@ class _HistogramState extends State<Histogram> {
 
   List<dynamic> _filterCarparkAvailability(List<dynamic> carparkList) {
     carparkList.forEach( (carpark) {
-        if (carpark.timestamp < DateTime.now().millisecondsSinceEpoch - Duration(days: 1).inMilliseconds){
+        if (carpark.timestamp < DateTime.now().toUtc().add(Duration(hours:8)).millisecondsSinceEpoch - Duration(days: 1).inMilliseconds){
           carpark.timestamp += Duration(days: 7).inMilliseconds;
         }
     });
@@ -164,9 +166,14 @@ class _HistogramState extends State<Histogram> {
   }
 
   Future _getHistogramData(String carparkCode) async {
-    await PullDateManager.pullMissingDates();
+    try {
+      await _sm.acquire();
+      await PullDateManager.pullMissingDates();
+    } finally {
+      _sm.release();
+    }
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
-    switch (DateTime.now().weekday) {
+    switch (DateTime.now().toUtc().add(Duration(hours:8)).weekday) {
       case 1:
         data['Mon'] = _filterCarparkAvailability(data['Mon']);
         break;
@@ -193,7 +200,7 @@ class _HistogramState extends State<Histogram> {
   }
 
   static String _getCurrentDayFromDateTime() {
-    switch (DateTime.now().weekday) {
+    switch (DateTime.now().toUtc().add(Duration(hours:8)).weekday) {
       case 1:
         return 'Mon';
         break;
