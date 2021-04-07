@@ -23,7 +23,7 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
   }
 
   final GlobalKey<MapViewState> key = new GlobalKey<MapViewState>();
-  List<Suggestion> suggestions = List<Suggestion>();
+  List<Suggestion> suggestions = [];
   PlaceApiProvider apiClient;
 
   var sessionToken;

@@ -11,7 +11,7 @@ class PullDateManager {
 
   static Future<int> getDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int lastDate = await prefs.getInt('date') ?? 0; // handle null value
+    int lastDate = prefs.getInt('date') ?? 0; // handle null value
     return lastDate;
   }
 
@@ -41,7 +41,7 @@ class PullDateManager {
     int pulls = (difference >= _pullWindow || difference < 0) ? _pullWindow : difference; // if difference >= pullWindow, means last pull was outside the window, and we need to do a complete pull.
     if (pulls >= _pullWindow) await DatabaseManager.deleteAllCarparkBefore(now); // delete all records if need to do a complete pull
     else await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow)).add(Duration(minutes: 15))); // delete all records outside the window otherwise
-    List<DateTime> pullList = new List<DateTime>();
+    List<DateTime> pullList = [];
     if (pulls > 0) {
       pullList.add(nearestHour);
       DateTime dec = new DateTime(

@@ -55,6 +55,7 @@ class CarparkListManager {
     );
   }
 
+  // ignore: non_constant_identifier_names
   Widget _APIErrorWidget() {
     return ListView(
       children: [Container(

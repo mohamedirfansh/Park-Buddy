@@ -23,8 +23,8 @@ class DatabaseManager {
     var timestamp = items["timestamp"];
     var carparkData = items["carpark_data"];
 
-    var carparkList = List<CarparkAvailability>();
-    List returnList = List<Map<String, dynamic>>();
+    List<CarparkAvailability> carparkList = [];
+    List<Map<String, dynamic>> returnList = [];
     for (var x in carparkData) {
       CarparkAvailability item = CarparkAvailability.fromJson(x, timestamp);
       if (!duplicateSet.containsKey(item.carparkNumber)) {

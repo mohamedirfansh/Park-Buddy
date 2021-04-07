@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geodesy/geodesy.dart' as geo;
 import 'package:park_buddy/control/LocationManager.dart';
@@ -80,7 +79,6 @@ class MapViewState extends State<MapView> {
             await _onMapCreated(controller);
           } else {
             await Permission.location.request();
-            var isShown = await Permission.contacts.shouldShowRequestRationale;
             await _onMapCreated(controller);
           }
         },
@@ -156,7 +154,6 @@ class MapViewState extends State<MapView> {
   }
 
   void addMarkerForLocation(String locationDetails, geo.LatLng location) async {
-    final controller = await _controller.future;
     MarkerGenerator markerGen = MarkerGenerator(120);
     final marker = Marker(
       icon: await markerGen.createBitmapDescriptorFromIconData(

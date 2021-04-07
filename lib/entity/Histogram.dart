@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:park_buddy/control/DatabaseManager.dart';
 import 'package:park_buddy/control/PullDateManager.dart';
-import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
