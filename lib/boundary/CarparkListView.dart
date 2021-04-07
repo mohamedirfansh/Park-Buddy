@@ -32,15 +32,13 @@ class _CarparkListViewState extends State<CarparkListView> {
         future: getUserLocation(),
         builder: (context, snapshot) {
           if (!snapshot.hasData && !snapshot.hasError) {
-            //Loading
             return _loadingWidget(false);
           } else if (snapshot.hasError) {
             return _loadingWidget(true);
           } else if (snapshot.hasData && snapshot.data != null) {
             return CarparkListManager().constructList(snapshot.data);
           } else {
-            //Error
-            return Container(child: Text("Error"));
+            return Container(child: Center(child: Text("Error")));
           }
         }
     );
