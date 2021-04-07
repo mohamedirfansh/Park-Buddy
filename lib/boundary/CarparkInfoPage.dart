@@ -9,9 +9,13 @@ import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 import 'package:park_buddy/entity/Histogram.dart';
 
+/// This class is dynamically filled for each Carpark when clicked on in the CarparkListView or MapViewWithSearch.
 class CarparkInfoPage extends StatefulWidget {
+  ///The specific carpark code that is used to dynamically generate the info page
   final String carparkCode;
+  ///The user location that is passed from the CarparkListView or MapViewWithSearch
   final LocationData userLocation;
+  ///The carpark's current CarparkAvailability that is passed from the CarparkListView or MapViewWithSearch
   final CarparkAvailability carparkAvailability;
   CarparkInfoPage(this.carparkCode,
       this.userLocation, this.carparkAvailability); // constructor: pass info of which carpark
@@ -27,11 +31,16 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
   final LocationData currentLocation;
   final CarparkAvailability carparkAvailability;
 
+  ///returns the distance between the currentLocation and the carpark location in kilometres
   double getDistance(double carparkLat, double carparkLong) {
     final double distance = Geodesy().distanceBetweenTwoGeoPoints(LatLng(carparkLat, carparkLong), LatLng(currentLocation.latitude, currentLocation.longitude));
     return distance * 0.001; //distance in kilometers
   }
 
+  ///Builds the CarparkInfoPage widget. It comprises of
+  /// 1) The title section
+  /// 2) The histogram section
+  /// 3) The shortcut to Google Maps
   @override
   Widget build(BuildContext context) {
     CarparkInfo carpark = CarparkInfoManager.carparkList
@@ -87,6 +96,9 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
     );
   }
 
+  ///Creates a widget for the title section of the carpark info page consisting of:
+  /// 1) The carpark address
+  /// 2) The unique carpark code
   Widget _titleSection(CarparkInfo carpark) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -113,10 +125,18 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
     );
   }
 
+  ///Creates a widget for the histogram section of the carpark info page consisting of:
+  /// 1) The histogram
+  ///@see Histogram
   Widget _carparkHistorySection(String carparkCode) {
     return Histogram(carparkCode);
   }
 
+  ///Creates a widget for the availability section of the carpark info page (inside the title section) consisting of:
+  /// 1) The current carpark availability
+  /// 2) The distance of the carpark from the user's current location
+  ///
+  /// This is run only when the carparkInfoSectionBuilder is able to return from the Future for getting the carpark availability.
   Widget _carparkAvailabilityInfoSection(
       CarparkInfo carpark, CarparkAvailability carparkAvailability) {
     return Container(
@@ -131,31 +151,42 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
         ]));
   }
 
+
+  ///Creates the info section in the title section of the infopage.
+  ///During the creation of the carpark info page, a CarparkAvailability may or may not be passed. 
+  ///This is dependent on whether the user accesses the info page from the map view (where carparkAvailability is not preloaded)
+  ///or list view, where carparkAvailability is loaded for all the carparks in the list.
   Widget _carparkInfoSectionBuilder(
       BuildContext context, CarparkInfo carpark) {
+    ///Entering from CarparkListView, CarparkAvailability is used to directly create info section
     if (carparkAvailability != null){
       return _carparkAvailabilityInfoSection(carpark, carparkAvailability);
-    }
-    return FutureBuilder(
+    } else return FutureBuilder(
+      ///Entering from MapViewWithSearch, CarparkAvailability is not provided, calling Future _getCarparkAvailability to get data.
       future: _getCarparkAvailability(carpark),
       builder: (context, snapshot) {
         if (snapshot.hasData == false && !snapshot.hasError) {
+          ///Show a loading widget while loading API
           return _apiLoadingWidget(carpark);
         } else if (snapshot.hasData) {
+          ///Data returned, create info section similar to above.
           return _carparkAvailabilityInfoSection(carpark, snapshot.data);
         } else {
-          return _emptyResultsWidget();
+          ///No data returned, show empty results widget
+          return _APIUnavailableWidget();
         }
       },
     );
   }
 
+  ///Access the CarparkAPIInterface and get a single carpark's availability
   Future<CarparkAvailability> _getCarparkAvailability(
       CarparkInfo carpark) async {
     return await CarparkAPIInterface.getSingleCarparkAvailability(
         DateTime.now(), carpark);
   }
 
+  ///Create a widget to show the user that the data is being loaded
   Widget _apiLoadingWidget(CarparkInfo carpark) {
     return Container(
         padding: const EdgeInsets.all(20),
@@ -167,7 +198,9 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
         ]));
   }
 
-  Widget _emptyResultsWidget() {
+  ///Create a widget that informs the user that the data was not returned from API.
+  // ignore: non_constant_identifier_names
+  Widget _APIUnavailableWidget() {
     return Container(
         padding: const EdgeInsets.all(20),
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
@@ -176,6 +209,7 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
         ]));
   }
 
+  ///A Future to use the first available map app on the current device to show directions
   Future<void> goToGoogleMaps(CarparkInfo info) async {
     final availableMaps = await MapLauncher.installedMaps;
     await availableMaps.first.showDirections(

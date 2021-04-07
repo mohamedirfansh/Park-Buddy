@@ -3,27 +3,22 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-//import 'package:http_retry/http_retry.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
+/// This class provides static methods to access carpark availability information from the API.
 class CarparkAPIInterface {
   static final dateFormat = DateFormat('yyyy-MM-ddTHH%3Amm%3Ass');
   static final jsonDateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
 
-  /// Pull HDB carpark availability data for a specified date and time
+  /// Pull HDB carpark availability data for a specified date and time.
+  ///
+  /// @param dateTime The DateTime object that is used to query the API.
+  /// @return This returns the full list of unparsed carpark availability information.
   static Future<Map> getCarparkMap(DateTime dateTime) async {
     String d = dateFormat.format(dateTime);
     var url =
         "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
-    //final client = RetryClient(http.Client());
-    /*
-    try {
-      response = await client.read(url);
-    } finally {
-      client.close();
-    }
-    */
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final list = json.decode(response.body);
@@ -36,6 +31,13 @@ class CarparkAPIInterface {
     }
   }
 
+  /// Returns a single carpark for a specified time and carpark
+  ///
+  /// @param dateTime The DateTime object that is used to query the API.
+  /// @param carpark The CarparkInfo object that provides the carpark code to filter the carpark list.
+  /// @return A single CarparkAvailability object that matches the given CarparkInfo
+  /// @see CarparkInfo
+  /// @see CarparkAvailability
   static Future<CarparkAvailability> getSingleCarparkAvailability(
       DateTime dateTime, CarparkInfo carpark) async {
     String d = dateFormat.format(dateTime);
@@ -61,6 +63,13 @@ class CarparkAPIInterface {
     }
   }
 
+  /// Returns a list of carparks for a specified time and list of carparks
+  ///
+  /// @param dateTime The DateTime object that is used to query the API.
+  /// @param carparks The List of CarparkInfo objects that provides the carpark codes to filter the carpark list.
+  /// @return A list of CarparkAvailability objects that matches the given CarparkInfos
+  /// @see CarparkInfo
+  /// @see CarparkAvailability
   static Future<Map<String, CarparkAvailability>> getMultipleCarparkAvailability(
       DateTime dateTime, List<CarparkInfo> carparks) async {
     String d = dateFormat.format(dateTime);
@@ -87,6 +96,7 @@ class CarparkAPIInterface {
   }
 }
 
+/// Exception to describe bad requests from API and combines the error code and message.
 class BadRequestException implements Exception {
   final _message;
   final _prefix;
