@@ -16,28 +16,19 @@ class CarparkListManager {
           CarparkInfoManager.carparkList,
           0.5,
           LatLng(currentLocation.latitude, currentLocation.longitude));
-
-      // return ListView.builder(
-      //   itemCount: carparks.length,
-      //   itemBuilder: (context, index) {
-      //     return CarparkCard(carpark: carparks[index]);
-      //   },
-      // );
       return FutureBuilder(
         future: CarparkAPIInterface.getMultipleCarparkAvailability(DateTime.now(), carparks),
         builder: (context, snapshot) {
           if (!snapshot.hasData && !snapshot.hasError) {
-            //Loading
             return _loadingWidget(false);
           } else if (snapshot.hasData && snapshot.hasError) {
-            return _loadingWidget(true);
+            return _APIErrorWidget();
           } else if (snapshot.hasData && snapshot.data != null) {
-            return _carparkListBuilder(carparks, snapshot.data);
-          } else if (snapshot.data == null) {
-            return _noCarparkWidget();
+            if (snapshot.data.isEmpty){
+              return _noCarparkWidget();
+            } else return _carparkListBuilder(carparks, snapshot.data);
           } else {
-            //Error
-            return Container(child: Text("Error"));
+            return Container(child: Center(child: Text("Error")));
           }
         },
       );
@@ -64,7 +55,7 @@ class CarparkListManager {
     );
   }
 
-  Widget _noCarparkWidget() {
+  Widget _APIErrorWidget() {
     return ListView(
       children: [Container(
       height: 100,
@@ -77,16 +68,16 @@ class CarparkListManager {
             radius: 25.0,
             backgroundImage: AssetImage('assets/images/parking-icon.png'),
           ),
-          title: Text("No carparks in area."),
+          title: Text("API unavailable, try again later"),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                "Try searching another area.",
+                "Invalid carpark list, please check internet connection",
                 style: TextStyle(fontSize: 15.0),
               ),
               Text(
-                "No carparks available in your vicinity.",
+                "Carpark list status: unavailable",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -96,4 +87,38 @@ class CarparkListManager {
     )],
     );
   }
+
+  Widget _noCarparkWidget() {
+    return ListView(
+      children: [Container(
+        height: 100,
+        padding: EdgeInsets.only(top: 8.0),
+        child: Card(
+          elevation: 2,
+          margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
+          child: ListTile(
+            leading: CircleAvatar(
+              radius: 25.0,
+              backgroundImage: AssetImage('assets/images/parking-icon.png'),
+            ),
+            title: Text("No carparks in area."),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "Try searching another area.",
+                  style: TextStyle(fontSize: 15.0),
+                ),
+                Text(
+                  "No carparks available in your vicinity.",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+      )],
+    );
+  }
+
 }

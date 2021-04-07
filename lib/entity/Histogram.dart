@@ -62,8 +62,7 @@ class _HistogramState extends State<Histogram> {
                         return Colors.amber;
                       } else return Colors.green;
                     },
-                    width: 0.8, // Width of the columns
-                    // animationDuration: 1000,// Spacing between the column
+                    width: 0.8,
                   )
                 ],
                 primaryXAxis: DateTimeAxis(
@@ -73,6 +72,7 @@ class _HistogramState extends State<Histogram> {
                   minorGridLines: MinorGridLines(
                       width: 0
                   ),
+                    plotBands: insertCurrentTimePlotBand(selectedDay),
                 ),
                 primaryYAxis: NumericAxis(
                     labelFormat: '{value}% empty',
@@ -121,6 +121,37 @@ class _HistogramState extends State<Histogram> {
         );
       }).toList(),
     );
+  }
+
+  List<PlotBand> insertCurrentTimePlotBand(String selectedDay){
+    if (selectedDay == _getCurrentDayFromDateTime()) {
+      return [
+        PlotBand(
+            isVisible: true,
+            start: DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+                DateTime.now().hour
+            ),
+            end: DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+                DateTime.now().hour
+            ),
+            text: 'Current time',
+            verticalTextPadding:'40%',
+            horizontalTextPadding: '-15%',
+            textStyle: TextStyle(color: Colors.black, fontSize: 16),
+            borderWidth: 2,
+            textAngle: 0,
+            borderColor: Colors.lightBlue
+        )
+      ];
+    } else {
+      return null;
+    }
   }
 
   List<dynamic> _filterCarparkAvailability(List<dynamic> carparkList) {

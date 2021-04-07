@@ -57,7 +57,6 @@ class DatabaseManager {
   }
 
   /// Note: ID and timestamp must match to update a row.
-  // TODO: better way to query? timestamp must be exact to find the carpark.
   static Future<int> updateCarpark(
       CarparkAvailability carparkAvailability) async {
     var dbClient = await AvailabilityDatabase.instance.database;
