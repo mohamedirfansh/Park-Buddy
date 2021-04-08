@@ -13,7 +13,6 @@ import 'package:park_buddy/entity/CarparkInfo.dart';
 class CarparkListManager {
   constructList(LocationData currentLocation) {
       final carparks = CarparkInfoManager.filterCarparksByDistance(
-          CarparkInfoManager.carparkList,
           0.5,
           LatLng(currentLocation.latitude, currentLocation.longitude));
       return FutureBuilder(

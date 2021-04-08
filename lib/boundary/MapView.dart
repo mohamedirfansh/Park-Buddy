@@ -37,7 +37,6 @@ class MapViewState extends State<MapView> {
   Future<void> _onMapCreated() async {
     var location = await LocationManager.currentLocation;
     var filteredList = CarparkInfoManager.filterCarparksByDistance(
-        CarparkInfoManager.carparkList,
         0.5,
         geo.LatLng(location.latitude, location.longitude));
 
@@ -149,7 +148,6 @@ class MapViewState extends State<MapView> {
     final controller = await _controller.future;
 
     _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(
-        CarparkInfoManager.carparkList,
         0.5,
         geo.LatLng(location.latitude, location.longitude)));
 

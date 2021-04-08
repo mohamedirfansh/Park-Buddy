@@ -8,6 +8,8 @@ import 'package:park_buddy/entity/CarparkPaymentMethod.dart';
 import 'package:park_buddy/entity/CarparkType.dart';
 import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 
+///This class is responsible for providing CarparkInfo data, loaded from the CSV obtained from the Singapore government.
+///This data is static information about the carparks like their addresses, LatLng info and unique carpark codes.
 class CarparkInfoManager {
   static List<CarparkInfo> _carparkList = [];
 
@@ -15,6 +17,7 @@ class CarparkInfoManager {
     return _carparkList;
   }
 
+  ///Loads the data into memory from our internal CSV file and caches it.
   static Future<List> loadDataFromCSV() async {
     final carparkData = await rootBundle.loadString(
         'assets/hdb-carpark-information-latlng-fixed.csv',
@@ -23,7 +26,7 @@ class CarparkInfoManager {
       throw Exception('No csv found');
     }
 
-    //final res = const CsvToListConverter().convert(carparkData);
+    ///Gets the CSV format and applies it across each line.
     const d = const FirstOccurrenceSettingsDetector(eols: ['\r\n', '\n']);
     List<List<dynamic>> res =
         const CsvToListConverter(csvSettingsDetector: d).convert(carparkData);
@@ -85,6 +88,8 @@ class CarparkInfoManager {
       if (shortTermParkingAvailability == null) {
         throw Exception('Unknown availability found.');
       }
+
+      ///Creates a CarparkInfo object from the line and adds it to the carparkList.
       var carparkInfo = CarparkInfo(
         res[i][0],
         res[i][1],
@@ -99,93 +104,17 @@ class CarparkInfoManager {
     return carparkList;
   }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CarparkInfoManager && runtimeType == other.runtimeType;
-
-  @override
-  int get hashCode => 0;
-
+  /// Filters the master carparkList by distance from the given position and returns a filtered list
   static List<CarparkInfo> filterCarparksByDistance(
-      List<CarparkInfo> dataList, num limitInKM, LatLng currentPos) {
+      num limitInKM, LatLng currentPos) {
     Geodesy geodesy = Geodesy();
-    if (dataList.length == null) {
+    if (carparkList.length == null) {
       throw Exception('Carpark list empty.');
     }
-    return dataList
+    return carparkList
         .where((carpark) =>
             geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) <
             limitInKM * 1000)
         .toList();
   }
 }
-
-// void _convertXYtoLatLngFromCSV async() {
-//   final coords = [];
-//   final XYvals = [];
-//   final res = const CsvToListConverter().convert(carparkData);
-//   res.sublist(1).forEach((carpark) => XYvals.add([double.parse(carpark[2]), double.parse(carpark[3])]));
-//
-//
-//   for (var i = 0; i < XYvals.length; i++) {
-//     try {
-//       var converted = await convertXYToLatLng(XYvals[i][0], XYvals[i][1]);
-//       coords.add([converted.lat, converted.lng]);
-//       sleep(Duration(milliseconds: 250));
-//     } catch(e) {
-//       print(e);
-//       print('Index $i failed to convert. Carpark name: ${res[i + 1][0]}');
-//     }
-//
-//
-//
-//   }
-//
-//
-//   for (var i = 1; i < res.length; i++){
-//     res[i][2] = coords[i-1][0];
-//     res[i][3] = coords[i-1][1];
-//   }
-//   try {
-//     String csv = const ListToCsvConverter().convert(res);
-//     final directory = await getApplicationDocumentsDirectory();
-//     print(directory.path);
-//     final path = directory.path;
-//     final file = File('$path/hdb-carpark-information-latlng.csv');
-//     await file.writeAsString(csv);
-//   } catch(e) {
-//     print(e);
-//     print('Unable to write CSV');
-//   }
-// }
-
-//This code was used to figure out which carpark in our CSV data was not available in the API. Subsequently fixed in assets/hdb-carpark-information-latlng-fixed.csv.
-
-// var items = await CarparkAPIInterface.getCarparkMap(DateTime.now());
-// Set<String> duplicateSet = new Set<String>();
-// var carparkString = items["carpark_data"];
-// List<String> duplicateList = [];
-// for(var i=0; i< carparkString.length; i++){
-//   if (!duplicateSet.contains(carparkString[i]['carpark_number'])) {
-//     duplicateSet.add(carparkString[i]['carpark_number']);
-//   } else {
-//     duplicateList.add(carparkString[i]['carpark_number']);
-//   }
-// }
-//
-//
-// print('duplicate list: $duplicateList');
-// var APIunavailableList = [];
-//
-// for (var i=0;i < carparkList.length; i++){
-//   if(!duplicateSet.contains(carparkList[i].carparkCode)){
-//     APIunavailableList.add(carparkList[i].carparkCode);
-//   }
-// }
-//
-// for (var i=0;i < APIunavailableList.length; i++){
-//   print(APIunavailableList[i]);
-// }
-
-// print(APIunavailableList.length);
