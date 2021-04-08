@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:park_buddy/boundary/CarparkListView.dart';
 import 'package:park_buddy/control/MapViewWithSearch.dart';
 
+///Entity class representing each tab in our tab view
 class TabNavigationItem {
   final Widget page;
   final String title;
@@ -13,6 +14,7 @@ class TabNavigationItem {
     @required this.icon,
   });
 
+  ///Provides information about the tabs like Icon, the class and the title to display.
   static List<TabNavigationItem> get items => [
         TabNavigationItem(
           page: MapViewWithSearch(),

@@ -182,7 +182,7 @@ class _HistogramState extends State<Histogram> {
     return carparkList;
   }
 
-  ///Gets the histogram data from the database and
+  ///Gets the histogram data from the database and processes it for histogram display
   Future _getHistogramData(String carparkCode) async {
     await PullDateManager.pullMissingDates();
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
@@ -190,6 +190,7 @@ class _HistogramState extends State<Histogram> {
     return data;
   }
 
+  ///Converts the int valeu of DateTime.now().weekday to a String for use in the Histogram.
   static String _getCurrentDayFromDateTime() {
     switch (DateTime.now().weekday) {
       case 1:
