@@ -6,17 +6,21 @@ import 'package:park_buddy/boundary/CarparkAPIInterface.dart';
 import 'package:park_buddy/entity/AvailabilityDatabase.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
 
+///The class to interface with the device's local SQL database.
 class DatabaseManager {
   static final _table = "AvailabilityTable";
   static final sm = LocalSemaphore(40);
-  /// Pull Carpark Availability API an convert into CarparkAvailability objects.
+  
+  /// Pull Carpark Availability API and convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date,
       {bool insertIntoDatabase = false}) async {
     var items = await CarparkAPIInterface.getCarparkMap(date);
     return await _availabilityFromJson(items, insertIntoDatabase);
   }
 
-  /// private method to convert retrieved carpark availability json into CarparkAvailability object
+  /// Private method to convert retrieved carpark availability json into CarparkAvailability objects
+  /// @param items The JSON map retrieved from the API representing the carpark availability information
+  /// @param insertIntoDatabase The option to update the database with the information retrieved from the API.
   static Future<List<Map>> _availabilityFromJson(
       Map<String, dynamic> items, bool insertIntoDatabase) async {
     Map<String, int> duplicateSet = new HashMap<String, int>();
@@ -49,13 +53,14 @@ class DatabaseManager {
     }
   }
 
-  /// insert a new CarparkAvailability object into the table
+  /// insert a new CarparkAvailability object into the database
   static Future insertCarpark(CarparkAvailability carparkAvailability) async {
     var dbClient = await AvailabilityDatabase.instance.database;
     var query = await dbClient.insert(_table, carparkAvailability.toMap());
     return query;
   }
-
+  /// Update method for a carpark.
+  /// 
   /// Note: ID and timestamp must match to update a row.
   static Future<int> updateCarpark(
       CarparkAvailability carparkAvailability) async {
@@ -80,7 +85,7 @@ class DatabaseManager {
     return query;
   }
 
-  /// Delete one carpark's availability information before a given datetime
+  /// Delete one carpark's availability information before a given datetime. Used when the carpark availability information is out of date and needs to be synchronised again.
   static Future<int> deleteCarparkBefore(
       String carparkNumber, DateTime timeBefore) async {
     var dbClient = await AvailabilityDatabase.instance.database;
@@ -91,7 +96,7 @@ class DatabaseManager {
     return query;
   }
 
-  /// Delete all carpark's availability information before a given datetime
+  /// Delete all carpark's availability information before a given datetime. Used when all carpark availability information is out of date and needs to be synchronised again.
   static Future<int> deleteAllCarparkBefore(DateTime timeBefore) async {
     var dbClient = await AvailabilityDatabase.instance.database;
     var time = timeBefore.millisecondsSinceEpoch;
@@ -99,7 +104,7 @@ class DatabaseManager {
     return query;
   }
 
-  // Return a list of all Carparks, sorted by date
+  /// Return a map of all CarparkAvailability, with the weekday as a key to access the day's list of CarparkAvailability.
   static Future<Map> getCarparkList(String carparkNumber) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     List<Map> results = await dbClient.query(
@@ -110,6 +115,7 @@ class DatabaseManager {
       orderBy: 'timestamp ASC',
     );
     List<CarparkAvailability> convertedResult = [];
+    
     results.forEach((element) {
       CarparkAvailability carpark = CarparkAvailability(
           carparkNumber: element['carparkNumber'],
@@ -126,7 +132,7 @@ class DatabaseManager {
       convertedResult.add(carpark);
     });
 
-
+    //Bucket the list into each day
     Map<String, List> dayMap = {
       'Mon': [],
       'Tues': [],
@@ -138,6 +144,7 @@ class DatabaseManager {
     };
 
 
+    //Sort the list to the map
     convertedResult.forEach((element) {
       DateTime entryDate = DateTime.fromMillisecondsSinceEpoch(element.timestamp);
       switch (entryDate.weekday) {
@@ -164,12 +171,16 @@ class DatabaseManager {
           break;
       }
     });
+    
+    //Sort the days by their timestamp
     dayMap.forEach((key, value) {
       value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     });
+    
     return dayMap;
   }
 
+  ///Debugging method to print all carparks.
   static void printAllCarparks() async {
     final dbClient = await AvailabilityDatabase.instance.database;
     List<Map> results =
@@ -178,12 +189,14 @@ class DatabaseManager {
     results.forEach((result) {
       print(result);
     });
+    
     int count = Sqflite.firstIntValue(
         await dbClient.rawQuery('SELECT COUNT(*) FROM $_table'));
     (count > 0) ? print(count) : print("empty");
   }
 
-  static Future<int> getEntries() async {
+  ///Get a count of all entries in a table. Used for debugging.
+  static Future<int> getCountOfEntries() async {
     final dbClient = await AvailabilityDatabase.instance.database;
 
     int count = Sqflite.firstIntValue(
@@ -192,7 +205,7 @@ class DatabaseManager {
     return count;
   }
 
-  //static int count = 0;
+  ///Insert carparks into database as a batch. Uses a semaphore to prevent concurrent insertion from multiple sources.
   static Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     final batch = dbClient.batch();
@@ -206,13 +219,12 @@ class DatabaseManager {
     try {
       await sm.acquire();
       await batch.commit(noResult: true);
-      //print("commited $count");
-      //count++;
     } finally {
       sm.release();
     }
   }
 
+  ///Debugging method to check the entries within a specific time window.
   static Future checkWindow(DateTime start, DateTime end) async {
     int startEpoch = start.millisecondsSinceEpoch;
     int endEpoch = end.millisecondsSinceEpoch;
@@ -223,10 +235,3 @@ class DatabaseManager {
     print(Sqflite.firstIntValue(count));
   }
 }
-
-// query: https://api.data.gov.sg/v1/transport/carpark-availability?date_time=2020-03-05T01%3A40%3A27
-
-// format: {"carpark_info":[{"total_lots":"91","lot_type":"C","lots_available":"33"}],"carpark_number":"HE12","update_datetime":"2021-03-03T22:49:23"}
-// other format: {"carpark_info":[{"total_lots":"73","lot_type":"C","lots_available":"0"},{"total_lots":"12","lot_type":"Y","lots_available":"2"},
-//                {"total_lots":"50","lot_type":"H","lots_available":"50"}],"carpark_number":"K2T","update_datetime":"2021-03-11T20:19:17"}
-// "carpark_number":"SK24","update_datetime":"2021-03-11T20:30:08"},{"carpark_info":[{"total_lots":"181","lot_type":"Y","lots_available":"200"}],"carpark_number":"SK24","update_datetime":"2016-02-19T11:19:28"},{"carpark_info":[{"total_lots":"181","lot_type":"H","lots_available":"200"}],"carpark_number":"SK24","update_datetime":"2016-02-19T11:19:29"},{"carpark_info":[{"total_lots":"225","lot_type":"C","lots_available":"61"}]
