@@ -105,6 +105,8 @@ class CarparkInfoManager {
   }
 
   /// Filters the master carparkList by distance from the given position and returns a filtered list
+  /// @param limitInKM the distance in kilometres to filter the list with
+  /// @param the LatLng object of the position to calculate the distance from.
   static List<CarparkInfo> filterCarparksByDistance(
       num limitInKM, LatLng currentPos) {
     Geodesy geodesy = Geodesy();
