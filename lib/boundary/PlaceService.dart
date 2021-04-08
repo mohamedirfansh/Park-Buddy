@@ -21,7 +21,7 @@ class PlaceApiProvider {
   PlaceApiProvider(this.sessionToken);
 
   final sessionToken;
-  final apiKey = '44444'; //'AIzaSyAZgPwhId1JCrLpMzgCfPABeGYV8Fkso-U';
+  final apiKey = 'AIzaSyAZgPwhId1JCrLpMzgCfPABeGYV8Fkso-U';
 
   Future<List<Suggestion>> fetchSuggestions(String input, String lang) async {
     final request =
