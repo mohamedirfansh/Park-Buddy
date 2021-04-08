@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
+///Displays screenshots of the app with instructions to show how to use the app.
 class OnBoardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SafeArea(
@@ -47,12 +48,15 @@ class OnBoardingPage extends StatelessWidget {
         ),
       );
 
+  ///Prevents user from going back to tutorial using the navigation back bar, by replacing the route instead of adding to the route.
   void goToHome(context) =>
       Navigator.pushReplacementNamed(context, '/multitabview');
 
+  ///Builds an image from an asset to display on the tutorial screens.
   Widget buildImage(String path) =>
       Center(child: Image.asset(path, width: 350));
 
+  ///Describes the style of the tutorial pages
   PageDecoration getPageDecoration() => PageDecoration(
         titleTextStyle: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         bodyTextStyle: TextStyle(fontSize: 20),
@@ -61,6 +65,7 @@ class OnBoardingPage extends StatelessWidget {
         pageColor: Colors.white,
       );
 
+  ///Describes the style of the navigation buttons in our tutorial
   DotsDecorator getDotDecoration() => DotsDecorator(
         color: Color(0xFFBDBDBD),
         size: Size(10, 10),

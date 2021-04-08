@@ -13,21 +13,28 @@ import 'package:park_buddy/control/MarkerIconGenerator.dart';
 import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/control/ScreenManager.dart';
 
+///This class displays the map view, including the carpark markers that represent carparks near the user.
 class MapView extends StatefulWidget {
   MapView({Key key}) : super(key: key);
   @override
   MapViewState createState() => MapViewState();
 }
 
+
+///The state class for the map view.
 class MapViewState extends State<MapView> {
   final Completer<GoogleMapController> _controller = Completer();
 
+  /// Camera position to show at initial app startup.
   static final CameraPosition _singapore = CameraPosition(
       bearing: 0, target: LatLng(1.3521, 103.8198), tilt: 0, zoom: 12);
 
+  ///A map of String to markers. Each marker is a carpark.
   final Map<String, Marker> _markers = {};
 
-  Future<void> _onMapCreated(GoogleMapController controller) async {
+  ///On creation of the map, we wait for the user's location and filter carparks within 500m of the user and refresh the map markers.
+  ///We also centre the map camera on the user's location.
+  Future<void> _onMapCreated() async {
     var location = await LocationManager.currentLocation;
     var filteredList = CarparkInfoManager.filterCarparksByDistance(
         CarparkInfoManager.carparkList,
@@ -38,6 +45,9 @@ class MapViewState extends State<MapView> {
     _zoomToCurrentLocation();
   }
 
+  ///Uses setState to rebuild the map with a new list of carparks.
+  ///If the list is empty, show a SnackBar indicating to the user that there are no nearby carparks.
+  ///@param list The list of CarparkInfo that is used to populate the markers and internal information.
   void _refreshMarkers(List<CarparkInfo> list) {
     setState(() {
       _markers.clear();
@@ -61,6 +71,10 @@ class MapViewState extends State<MapView> {
     });
   }
 
+
+  ///Builds the widget with an appbar, the GoogleMap (provided by Google Map API) and checks for user location permissions.
+  ///Asks for user location if not granted.
+  ///Takes the _markers list to populate carparks in area.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,10 +90,10 @@ class MapViewState extends State<MapView> {
         onMapCreated: (GoogleMapController controller) async {
           _controller.complete(controller);
           if (await Permission.location.isGranted) {
-            await _onMapCreated(controller);
+            await _onMapCreated();
           } else {
             await Permission.location.request();
-            await _onMapCreated(controller);
+            await _onMapCreated();
           }
         },
         markers: _markers.values.toSet(),
@@ -98,6 +112,9 @@ class MapViewState extends State<MapView> {
     );
   }
 
+  ///Fills the list of markers with the appropriate information like type of payment, type of carpark etc.
+  ///@param markers The list of markers that needs to be filled with CarparkInfo data.
+  ///@param data The CarparkInfo data used to filled the markers, with info like payment type or carpark type (surface, multistorey etc)
   Map<String, Marker> _fillDataToMarkers(
       Map<String, Marker> markers, List<CarparkInfo> data) {
     for (var i = 0; i < data.length; i++) {
@@ -108,6 +125,7 @@ class MapViewState extends State<MapView> {
         infoWindow: InfoWindow(
           title: carpark.address,
           snippet: _formatCarparkInformationForMarker(carpark),
+          ///Connect each marker to open a dynamic info page using ScreenManager.
           onTap: () => ScreenManager.openDynamicInfoPage(context, carpark.carparkCode, null),
         ),
       );
@@ -117,25 +135,16 @@ class MapViewState extends State<MapView> {
     return markers;
   }
 
+  ///Moves the map camera to the user's current location and shows all the carparks within 500m of the user's location.
   void _zoomToCurrentLocation() async {
-    final controller = await _controller.future;
 
     var currentLocation = await LocationManager.currentLocation;
     LocationManager.locationModeSelf = true;
-    _refreshMarkers(CarparkInfoManager.filterCarparksByDistance(
-        CarparkInfoManager.carparkList,
-        0.5,
-        geo.LatLng(currentLocation.latitude, currentLocation.longitude)));
 
-    await controller.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(
-        bearing: 0,
-        target: LatLng(currentLocation.latitude, currentLocation.longitude),
-        zoom: 15.0,
-      ),
-    ));
+    zoomToLocation(geo.LatLng(currentLocation.latitude, currentLocation.longitude));
   }
 
+  ///Moves the map camera to the given location. Additionally, it shows all the carparks within 500m of the given location.
   void zoomToLocation(geo.LatLng location) async {
     final controller = await _controller.future;
 
@@ -153,6 +162,7 @@ class MapViewState extends State<MapView> {
     ));
   }
 
+  ///This adds a location marker that is different from the red carpark markers, indicating the location that the user searched.
   void addMarkerForLocation(String locationDetails, geo.LatLng location) async {
     MarkerGenerator markerGen = MarkerGenerator(120);
     final marker = Marker(
@@ -166,6 +176,7 @@ class MapViewState extends State<MapView> {
     });
   }
 
+  ///Returns a formatted string to display for a carpark marker, given the CarparkInfo. The string contains the carpark type and payment type.
   String _formatCarparkInformationForMarker(CarparkInfo carparkInfo) {
     String carparkType = ' Carpark';
     switch (carparkInfo.carparkType) {
