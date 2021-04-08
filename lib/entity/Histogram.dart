@@ -5,6 +5,8 @@ import 'package:park_buddy/control/PullDateManager.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+
+///This class is responsible for showing the historical carpark information for the previous week in an easy to read interface.
 class Histogram extends StatefulWidget {
   @override
   _HistogramState createState() => _HistogramState(carparkCode);
@@ -12,10 +14,15 @@ class Histogram extends StatefulWidget {
   Histogram(this.carparkCode);
 }
 
+///The state class for the Histogram.
 class _HistogramState extends State<Histogram> {
   _HistogramState(this.carparkCode);
   final carparkCode;
+
+  ///Defaults to the current day.
   String selectedDay = _getCurrentDayFromDateTime();
+
+  ///Builds a histogram widget with a dropdown menu to change the day being viewed.
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -34,6 +41,7 @@ class _HistogramState extends State<Histogram> {
     );
   }
 
+  ///The histogram itself.
   Widget _histogram() {
     return FutureBuilder(
         future: _getHistogramData(carparkCode),
@@ -51,15 +59,9 @@ class _HistogramState extends State<Histogram> {
                       return 100*(carpark.lotsAvailableC/carpark.totalLotsC);
                     },
                     pointColorMapper: (dynamic carpark, _) {
-                      var fraction = carpark.lotsAvailableC/carpark.totalLotsC;
-                      if (fraction < 0.3) {
-                        return Colors.red;
-                      } else if ( fraction < 0.5)
-                      {
-                        return Colors.deepOrange;
-                      } else if (fraction < 0.7) {
-                        return Colors.amber;
-                      } else return Colors.green;
+                      var fraction = carpark.lotsAvailableC /
+                          carpark.totalLotsC;
+                      return _availabilityToColor(fraction);
                     },
                     width: 0.8,
                   )
@@ -96,6 +98,21 @@ class _HistogramState extends State<Histogram> {
     );
   }
 
+  ///Converts the availability to a colour for each band of the histogram.
+  ///
+  /// @param availability The carpark's availability (Maximum 1.) Higher means more empty.
+  Color _availabilityToColor(double availability){
+      if (availability < 0.3) {
+        return Colors.red;
+      } else if ( availability < 0.5)
+      {
+        return Colors.deepOrange;
+      } else if (availability < 0.7) {
+        return Colors.amber;
+      } else return Colors.green;
+  }
+
+  ///The widget to select the day of the week to view from the histogram.
   Widget _dropdownMenu() {
     return DropdownButton<String>(
       value: selectedDay,
@@ -122,6 +139,8 @@ class _HistogramState extends State<Histogram> {
     );
   }
 
+
+  ///Inserts a PlotBand for the current day of the week. If we are viewing another day, return null.
   List<PlotBand> insertCurrentTimePlotBand(String selectedDay){
     if (selectedDay == _getCurrentDayFromDateTime()) {
       return [
@@ -153,6 +172,7 @@ class _HistogramState extends State<Histogram> {
     }
   }
 
+  ///Filters the carparkAvailability for dates that are in the future for the current day, as it shows a disjointed histogram otherwise.
   List<dynamic> _filterCarparkAvailability(List<dynamic> carparkList) {
     carparkList.forEach( (carpark) {
         if (carpark.timestamp < DateTime.now().millisecondsSinceEpoch - Duration(days: 1).inMilliseconds){
@@ -162,32 +182,11 @@ class _HistogramState extends State<Histogram> {
     return carparkList;
   }
 
+  ///Gets the histogram data from the database and
   Future _getHistogramData(String carparkCode) async {
     await PullDateManager.pullMissingDates();
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
-    switch (DateTime.now().weekday) {
-      case 1:
-        data['Mon'] = _filterCarparkAvailability(data['Mon']);
-        break;
-      case 2:
-        data['Tues'] = _filterCarparkAvailability(data['Tues']);
-        break;
-      case 3:
-        data['Wed'] = _filterCarparkAvailability(data['Wed']);
-        break;
-      case 4:
-        data['Thurs'] = _filterCarparkAvailability(data['Thurs']);
-        break;
-      case 5:
-        data['Fri'] = _filterCarparkAvailability(data['Fri']);
-        break;
-      case 6:
-        data['Sat'] = _filterCarparkAvailability(data['Sat']);
-        break;
-      case 7:
-        data['Sun'] = _filterCarparkAvailability(data['Sun']);
-        break;
-    }
+    data[_getCurrentDayFromDateTime()] = _filterCarparkAvailability(data[_getCurrentDayFromDateTime()]);
     return data;
   }
 
@@ -214,9 +213,9 @@ class _HistogramState extends State<Histogram> {
       case 7:
         return 'Sun';
         break;
+      default:
+        return 'Mon';
     }
-
-    return 'Mon';
   }
 
 }

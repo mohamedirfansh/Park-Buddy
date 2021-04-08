@@ -3,12 +3,13 @@ import 'package:park_buddy/control/ScreenManager.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
-
+///This is a UI class for showing carparks in the CarparkListView using the data provided in the constructor.
 class CarparkCard extends StatelessWidget {
   final CarparkInfo carpark;
   final CarparkAvailability carparkAvailability;
   CarparkCard(this.carpark, this.carparkAvailability);
 
+  ///Builds the CarparkCard widget.
   @override
   Widget build(BuildContext context) {
     if (carparkAvailability != null) {
@@ -45,6 +46,7 @@ class CarparkCard extends StatelessWidget {
     return _missingAvailabilityCard();
   }
 
+  ///If the carparkAvailability is missing, it means the API has not finished loading yet, so we show some loading text.
   Widget _missingAvailabilityCard(){
     return Container(
       height: 100,

@@ -26,8 +26,6 @@ class ScreenManager {
         ///Default Error route.
         return _errorRoute();
     }
-
-    return _errorRoute();
   }
 
   static Route<dynamic> _errorRoute() {

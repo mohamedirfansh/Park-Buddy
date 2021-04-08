@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+
 /// Stores a carpark's availability information at a given time.
 /// (@category Entity)
 class CarparkAvailability {
@@ -46,7 +47,10 @@ class CarparkAvailability {
     this.updateDatetime,
     this.timestamp,
   });
-  /// factory method to create a CarparkAvailability object from a json mapping
+  /// Factory method to create a CarparkAvailability object from a json mapping
+  ///
+  /// @param json The Map<String, dynamic> that contains CarparkAvailability fields.
+  /// @param timestamp The timestamp at which the json was obtained from the API.
   factory CarparkAvailability.fromJson(Map<String, dynamic> json, String timestamp) {
     final dateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
     DateTime date = dateFormat.parse(timestamp, true).subtract(Duration(hours:8));
@@ -86,7 +90,11 @@ class CarparkAvailability {
     );
   }
 
-  // Constructor from json string (non factory method)
+  ///Constructor for the CarparkAvailabiltiy object from JSON.
+  ///Non-factory method used in concrete instantiation
+  ///
+  /// @param json The Map<String, dynamic> that contains CarparkAvailability fields.
+  /// @param timestamp The timestamp at which the json was obtained from the API.
   CarparkAvailability.createFromJson(Map<String, dynamic> json, DateTime timestamp) {
     final dateFormat = DateFormat('yyyy-MM-ddThh:mm:ss');
     int totalH=0, totalC=0, totalY=0;
@@ -122,6 +130,7 @@ class CarparkAvailability {
     this.lotsAvailableY = availY;
     this.updateDatetime = dateFormat.parse(json["update_datetime"],true).subtract(Duration(hours:8)).millisecondsSinceEpoch;
   }
+
   /// Converts object to a map for storage into database
   Map<String, dynamic> toMap() {
     return {
