@@ -9,22 +9,26 @@ class PullDateManager {
   /// Defines the timeframe that we maintain the historical data for. (i.e. pullWindow = 24; historical data for the past 24 hours will be maintained.)
   static final int _pullWindow = 7*24; // 1 week
 
+  ///Gets the last updated date stored in the shared preferences. Used to check when the app was last opened and updated.
   static Future<int> getDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int lastDate = prefs.getInt('date') ?? 0; // handle null value
     return lastDate;
   }
 
+  ///Saves a date to the phone's shared preferences.
   static saveDate(int lastEpochDate) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt('date', lastEpochDate);
   }
 
+  ///Resets the phone's shared preferences date to 0.
   static resetDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt('date', 0);
   }
 
+  ///Pulls all missing dates by comparing the current date and the last updated date, then pulling the required number of windows (in hours).
   static Future<int> pullMissingDates() async {
     int lastDate = await getDate();
 
@@ -33,15 +37,28 @@ class PullDateManager {
 
     final Duration delta = Duration(minutes: 30); // round to nearest 30 minutes
     DateTime nearestHour = DateTime.fromMillisecondsSinceEpoch(now.millisecondsSinceEpoch - now.millisecondsSinceEpoch % delta.inMilliseconds);
-    if (nearestHour.minute == 0)
+
+    if (nearestHour.minute == 0){
       nearestHour = nearestHour.subtract(Duration(minutes:30));
+    }
+
     int difference = nearestHour.difference(date).inMinutes; // get the difference between current time and last recorded date.
     difference = (difference/60).ceil();
-    final int saved = nearestHour.millisecondsSinceEpoch; // save the time so that we can storpue it later as reference
+
+    final int latestHour = nearestHour.millisecondsSinceEpoch; // save the time so that we can storpue it later as reference
+
     int pulls = (difference >= _pullWindow || difference < 0) ? _pullWindow : difference; // if difference >= pullWindow, means last pull was outside the window, and we need to do a complete pull.
-    if (pulls >= _pullWindow) await DatabaseManager.deleteAllCarparkBefore(now); // delete all records if need to do a complete pull
-    else await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow)).add(Duration(minutes: 15))); // delete all records outside the window otherwise
+
+    // delete all records if need to do a complete pull
+    if (pulls >= _pullWindow) {
+      await DatabaseManager.deleteAllCarparkBefore(now);
+    } else {
+      // delete all records outside the window otherwise
+      await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours:_pullWindow)).add(Duration(minutes: 15)));
+    }
+
     List<DateTime> pullList = [];
+
     if (pulls > 0) {
       pullList.add(nearestHour);
       DateTime dec = new DateTime(
@@ -66,7 +83,7 @@ class PullDateManager {
         throw Exception("Cannot connect to API");
       }
     }
-    saveDate(saved);
+    saveDate(latestHour);
     return pulls;
   }
 }

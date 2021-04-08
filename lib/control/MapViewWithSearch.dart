@@ -9,19 +9,23 @@ import 'package:park_buddy/boundary/PlaceService.dart';
 
 import 'LocationManager.dart';
 
+///The control class that handles the location searching. Comprises of the mapview as well as the autocompleting search bar.
 class MapViewWithSearch extends StatefulWidget {
   @override
   _MapViewWithSearchState createState() => _MapViewWithSearchState();
 }
 
+///The state class for the Widget.
 class _MapViewWithSearchState extends State<MapViewWithSearch> {
   final _controller = TextEditingController();
   final _searchBarController = FloatingSearchBarController();
+  ///Generate a UUID for the autocomplete session. This tags the autocomplete query with an ID to prevent our cloud service from being overcharged for multiple services.
   _MapViewWithSearchState() {
     this.sessionToken = Uuid().v4();
     apiClient = PlaceApiProvider(sessionToken);
   }
 
+  
   final GlobalKey<MapViewState> key = new GlobalKey<MapViewState>();
   List<Suggestion> suggestions = [];
   PlaceApiProvider apiClient;
@@ -29,6 +33,7 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
   var sessionToken;
   var currentQuery = '';
 
+  ///Overriding the default dispose() method to properly dispose of the search bar and the map view together.
   @override
   void dispose() {
     _controller.dispose();
@@ -36,6 +41,7 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
     super.dispose();
   }
 
+  ///Builds our map view together with the floating search bar.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,13 +50,14 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
         fit: StackFit.expand,
         children: [
           MapView(key: key),
-          buildFloatingSearchBar(),
+          _floatingSearchBar(),
         ],
       ),
     );
   }
 
-  Widget buildFloatingSearchBar() {
+  ///Populates the search bar with our intended styling
+  Widget _floatingSearchBar() {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     return FloatingSearchBar(
@@ -83,12 +90,24 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
           showIfClosed: false,
         ),
       ],
+      ///The builder to build out suggestions
       builder: (context, transition) {
         return _autocompleteSuggestionBuilder(context);
       },
     );
   }
 
+  ///The FutureBuilder returns a widget corresponding to the state of completion of the Future. The Future we call here is to fetch suggestions from the apiClient (the PlaceService).
+  ///
+  /// If the query is empty, we show the presearch widget to tell the user to start typing.
+  ///
+  /// If the query has returned with an error, we show an error widget telling the user that the API is down.
+  ///
+  /// If the query has not returned, we show a loading widget.
+  ///
+  /// If the query has returned with results, we build the suggestions list.
+  ///
+  /// If the query has return with no results, we show the empty results widget.
   FutureBuilder<List<Suggestion>> _autocompleteSuggestionBuilder(
       BuildContext context) {
       return FutureBuilder(
@@ -113,6 +132,7 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
       );
   }
 
+  ///Suggests to the user to start typing to start the autocomplete.
   Widget _preSearchWidget() {
     return Container(
       padding: EdgeInsets.all(16.0),
@@ -124,6 +144,8 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
     );
   }
 
+
+  ///Tells the user the autocomplete is still loading results.
   Widget _searchLoadingWidget() {
     return Container(
       padding: EdgeInsets.all(16.0),
@@ -135,6 +157,7 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
     );
   }
 
+  ///Builds out the suggestion list.
   Widget _suggestionListViewWidget(AsyncSnapshot<List<Suggestion>> snapshot) {
     return ListView.builder(
       itemBuilder: (context, index) => ListTile(
@@ -169,17 +192,19 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
     );
   }
 
+  ///Tells the user that their search returned no results.
   Widget _emptyResultsWidget() {
     return Container(
       padding: EdgeInsets.all(16.0),
       child: Center(
-        child: Text('No results found.'),
+        child: Text('No results found. Did you misspell your location?'),
       ),
       color: Colors.white,
       constraints: BoxConstraints.expand(width: 380, height: 50),
     );
   }
 
+  ///Tells the user that the server is down. Likely that the API is down or the API key has expired.
   Widget _errorResultsWidget() {
     return Container(
       padding: EdgeInsets.all(16.0),
