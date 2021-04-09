@@ -39,11 +39,7 @@ class ScreenManager {
     });
   }
 
-  ///Opens a dynamic info page
-  ///
-  /// @param carparkCode The unique carpark code for identifying the carpark
-  /// @param context the BuildContext for the Navigator
-  /// @param carparkAvailability The CarparkAvailability object that contains the latest data.
+  ///Opens a dynamic info page, passing in the build [context], the unique [carparkCode] for the carpark, and it's [carparkAvailability].
   static void openDynamicInfoPage(BuildContext context, String carparkCode, CarparkAvailability carparkAvailability) async {
     Navigator.pushNamed(context, '/carparkinfopage',
         arguments: [carparkCode, await LocationManager.currentLocation, carparkAvailability]);

@@ -23,14 +23,13 @@ class DatabaseManager {
     }
   }
 
-  /// Private method to convert retrieved carpark availability json into CarparkAvailability objects
-  /// @param items The JSON map retrieved from the API representing the carpark availability information
-  /// @param insertIntoDatabase The option to update the database with the information retrieved from the API.
+  /// Private method to convert the retrieved [json] map into CarparkAvailability objects
+  /// Optionally (depending on [insertIntoDatabase]), we can also update the database with the information retrieved from the API.
   static Future<List<Map>> _availabilityFromJson(
-      Map<String, dynamic> items, bool insertIntoDatabase) async {
+      Map<String, dynamic> json, bool insertIntoDatabase) async {
     Map<String, int> duplicateSet = new HashMap<String, int>();
-    var timestamp = items["timestamp"];
-    var carparkData = items["carpark_data"];
+    var timestamp = json["timestamp"];
+    var carparkData = json["carpark_data"];
 
     List<CarparkAvailability> carparkList = [];
     List<Map<String, dynamic>> returnList = [];

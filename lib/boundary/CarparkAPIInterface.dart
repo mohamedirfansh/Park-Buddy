@@ -14,8 +14,9 @@ class CarparkAPIInterface {
 
   /// Pull HDB carpark availability data for a specified date and time.
   ///
-  /// @param dateTime The DateTime object that is used to query the API.
-  /// @return This returns the full list of unparsed carpark availability information.
+  /// This functions takes a requested [dateTime] and queries the government API for data.
+  /// This returns the full list of un-parsed carpark availability information.
+  /// The API does not support individual carpark retrieval.
   static Future<Map> getCarparkMap(DateTime dateTime) async {
     String d = dateFormat.format(dateTime);
     var url =
@@ -34,11 +35,8 @@ class CarparkAPIInterface {
 
   /// Returns a single carpark for a specified time and carpark
   ///
-  /// @param dateTime The DateTime object that is used to query the API.
-  /// @param carpark The CarparkInfo object that provides the carpark code to filter the carpark list.
-  /// @return A single CarparkAvailability object that matches the given CarparkInfo
-  /// @see CarparkInfo
-  /// @see CarparkAvailability
+  /// Takes a requested [dateTime] and [carpark] info, queries the government API and returns a single carpark.
+  /// Used in the CarparkInfoPage when we need to show only a single carpark's up-to-date information.
   static Future<CarparkAvailability> getSingleCarparkAvailability(
       DateTime dateTime, CarparkInfo carpark) async {
     String d = dateFormat.format(dateTime);
@@ -66,11 +64,8 @@ class CarparkAPIInterface {
 
   /// Returns a list of carparks for a specified time and list of carparks
   ///
-  /// @param dateTime The DateTime object that is used to query the API.
-  /// @param carparks The List of CarparkInfo objects that provides the carpark codes to filter the carpark list.
-  /// @return A list of CarparkAvailability objects that matches the given CarparkInfos
-  /// @see CarparkInfo
-  /// @see CarparkAvailability
+  /// Takes requested [dateTime] and [carparks] to query the government API and returns a list of carpark information.
+  /// Used in the CarparkListView when we show multiple carpark information.
   static Future<Map<String, CarparkAvailability>> getMultipleCarparkAvailability(
       DateTime dateTime, List<CarparkInfo> carparks) async {
     String d = dateFormat.format(dateTime);

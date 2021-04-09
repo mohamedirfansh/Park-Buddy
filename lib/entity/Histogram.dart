@@ -175,9 +175,7 @@ class _HistogramState extends State<Histogram> {
     );
   }
 
-  ///Converts the availability to a colour for each band of the histogram.
-  ///
-  /// @param availability The carpark's availability (Maximum 1.) Higher means more empty.
+  ///Converts the [availability] to a colour for each band of the histogram.
   Color _availabilityToColor(double availability){
       if (availability < 0.3) {
         return Colors.red;

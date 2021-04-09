@@ -128,7 +128,6 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
 
   ///Creates a widget for the histogram section of the carpark info page consisting of:
   /// 1) The histogram
-  ///@see Histogram
   Widget _carparkHistorySection(String carparkCode) {
     return Histogram(carparkCode);
   }

@@ -47,12 +47,9 @@ class CarparkListManager {
       );
   }
 
-  ///Returns a ListViewBuilder that takes a list and dynamically fills a ListView with CarparkCards. These are UI objects that encapsulates the Carpark information.
-  ///
-  /// @param carparks The list of fixed carpark information
-  /// @param carparkAvailMap The raw data of carparkAvailability
-  ///
-  /// @see CarparkCard
+  ///Returns a ListViewBuilder that takes a [carparks] list and dynamically fills a ListView with [CarparkCard]s from the information in [carparkAvailMap].
+  ///The cards are UI objects that encapsulates the Carpark information.
+  ///This combined static information from [carparks] and live information from [carparkAvailMap].
   Widget _carparkListBuilder(List<CarparkInfo> carparks, Map<String, CarparkAvailability> carparkAvailMap) {
     return ListView.builder(
           itemCount: carparks.length,

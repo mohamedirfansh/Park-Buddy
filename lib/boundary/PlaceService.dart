@@ -27,13 +27,10 @@ class PlaceApiProvider {
   final sessionToken;
   final apiKey = 'AIzaSyAZgPwhId1JCrLpMzgCfPABeGYV8Fkso-U';
 
-  ///Fetches suggestions using the Google Places API. This search is done in the device's local language.
-  ///
-  ///@param input The string input from the search bar
-  ///@param lang The language code that the phone uses.
-  Future<List<Suggestion>> fetchSuggestions(String input, String lang) async {
+  ///Fetches suggestions with the [input] using the Google Places API. This search is done in the device's local [language].
+  Future<List<Suggestion>> fetchSuggestions(String input, String language) async {
     final request =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&language=$lang&components=country:sg&key=$apiKey&sessiontoken=$sessionToken';
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&language=$language&components=country:sg&key=$apiKey&sessiontoken=$sessionToken';
     final response = await client.get(Uri.parse(request));
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
@@ -53,8 +50,7 @@ class PlaceApiProvider {
     }
   }
 
-  ///Async operation to use the placeID to get the LatLng data from the Google Places API.
-  ///@param placeId the placeID that was attached to the suggestion in the search bar dropdown.
+  ///Async operation to use the [placeID] to get the LatLng data from the Google Places API.
   Future<LatLng> getPlaceLatLngFromId(String placeId) async {
     final request =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=geometry/location&key=$apiKey&sessiontoken=$sessionToken';
