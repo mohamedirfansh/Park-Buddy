@@ -8,7 +8,7 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 class DatabaseManager {
   static final _table = "AvailabilityTable";
-  static final sm = LocalSemaphore(30);
+  static final sm = LocalSemaphore(10);
 
   /// Pull Carpark Availability API an convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date,
@@ -115,6 +115,7 @@ class DatabaseManager {
       whereArgs: [carparkNumber],
       orderBy: 'timestamp ASC',
     );
+
     List<CarparkAvailability> convertedResult = [];
     results.forEach((element) {
       CarparkAvailability carpark = CarparkAvailability(
@@ -158,6 +159,7 @@ class DatabaseManager {
           break;
       }
     });
+    //dayMap['Today'].forEach((e) => print(DateTime.fromMillisecondsSinceEpoch(e.timestamp)));
     dayMap.forEach((key, value) {
       value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     });
