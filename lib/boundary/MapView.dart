@@ -14,6 +14,7 @@ import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/control/ScreenManager.dart';
 
 ///This class displays the map view, including the carpark markers that represent carparks near the user.
+/// {@category Boundary}
 class MapView extends StatefulWidget {
   MapView({Key key}) : super(key: key);
   @override
@@ -44,9 +45,8 @@ class MapViewState extends State<MapView> {
     _zoomToCurrentLocation();
   }
 
-  ///Uses setState to rebuild the map with a new list of carparks.
-  ///If the list is empty, show a SnackBar indicating to the user that there are no nearby carparks.
-  ///@param list The list of CarparkInfo that is used to populate the markers and internal information.
+  ///Uses setState to rebuild the map with a new [list] of carparks.
+  ///If the [list] is empty, show a SnackBar indicating to the user that there are no nearby carparks.
   void _refreshMarkers(List<CarparkInfo> list) {
     setState(() {
       _markers.clear();
@@ -111,9 +111,7 @@ class MapViewState extends State<MapView> {
     );
   }
 
-  ///Fills the list of markers with the appropriate information like type of payment, type of carpark etc.
-  ///@param markers The list of markers that needs to be filled with CarparkInfo data.
-  ///@param data The CarparkInfo data used to filled the markers, with info like payment type or carpark type (surface, multistorey etc)
+  ///Fills the list of [markers] containing with the appropriate [data] like type of payment, type of carpark (surface, multistorey etc).
   Map<String, Marker> _fillDataToMarkers(
       Map<String, Marker> markers, List<CarparkInfo> data) {
     for (var i = 0; i < data.length; i++) {

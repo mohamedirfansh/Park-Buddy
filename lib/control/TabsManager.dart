@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:park_buddy/entity/TabNavigationItem.dart';
 
 ///This class controls the view between the MapViewWithSearch and the CarparkListView by providing a BottomNavigationBar.
-class MultiTabView extends StatefulWidget {
+/// {@category Control}
+class TabsManager extends StatefulWidget {
   @override
-  _MultiTabViewState createState() => _MultiTabViewState();
+  _TabsManagerState createState() => _TabsManagerState();
 }
 
-class _MultiTabViewState extends State<MultiTabView> {
+class _TabsManagerState extends State<TabsManager> {
   int _currentIndex = 0;
 
   @override

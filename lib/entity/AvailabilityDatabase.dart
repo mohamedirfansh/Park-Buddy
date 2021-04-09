@@ -4,8 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// SQLite database to store historical carpark lot availability data.
-/// (@category Entity)
-/// (@subCategory Persistent Data)
+/// {@category Entity}
 class AvailabilityDatabase {
   AvailabilityDatabase._(); // ensure only one copy of database exists
   /// Instance of AvailabilityDatabase to prevent multiple copies of database in memory

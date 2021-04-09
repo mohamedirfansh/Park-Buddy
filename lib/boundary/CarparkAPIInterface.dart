@@ -7,19 +7,21 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
 /// This class provides static methods to access carpark availability information from the API.
+/// {@category Boundary}
 class CarparkAPIInterface {
   static final dateFormat = DateFormat('yyyy-MM-ddTHH%3Amm%3Ass');
   static final jsonDateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
 
   /// Pull HDB carpark availability data for a specified date and time.
   ///
-  /// @param dateTime The DateTime object that is used to query the API.
-  /// @return This returns the full list of unparsed carpark availability information.
+  /// This functions takes a requested [dateTime] and queries the government API for data.
+  /// This returns the full list of un-parsed carpark availability information.
+  /// The API does not support individual carpark retrieval.
   static Future<Map> getCarparkMap(DateTime dateTime) async {
     String d = dateFormat.format(dateTime);
     var url =
         "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final list = json.decode(response.body);
       final items = list['items'][0];
@@ -33,17 +35,14 @@ class CarparkAPIInterface {
 
   /// Returns a single carpark for a specified time and carpark
   ///
-  /// @param dateTime The DateTime object that is used to query the API.
-  /// @param carpark The CarparkInfo object that provides the carpark code to filter the carpark list.
-  /// @return A single CarparkAvailability object that matches the given CarparkInfo
-  /// @see CarparkInfo
-  /// @see CarparkAvailability
+  /// Takes a requested [dateTime] and [carpark] info, queries the government API and returns a single carpark.
+  /// Used in the CarparkInfoPage when we need to show only a single carpark's up-to-date information.
   static Future<CarparkAvailability> getSingleCarparkAvailability(
       DateTime dateTime, CarparkInfo carpark) async {
     String d = dateFormat.format(dateTime);
     var url =
         "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final list = json.decode(response.body);
       final info = list['items'][0]['carpark_data']
@@ -65,17 +64,14 @@ class CarparkAPIInterface {
 
   /// Returns a list of carparks for a specified time and list of carparks
   ///
-  /// @param dateTime The DateTime object that is used to query the API.
-  /// @param carparks The List of CarparkInfo objects that provides the carpark codes to filter the carpark list.
-  /// @return A list of CarparkAvailability objects that matches the given CarparkInfos
-  /// @see CarparkInfo
-  /// @see CarparkAvailability
+  /// Takes requested [dateTime] and [carparks] to query the government API and returns a list of carpark information.
+  /// Used in the CarparkListView when we show multiple carpark information.
   static Future<Map<String, CarparkAvailability>> getMultipleCarparkAvailability(
       DateTime dateTime, List<CarparkInfo> carparks) async {
     String d = dateFormat.format(dateTime);
     var url =
         "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
 
       final rawCarparkData = json.decode(

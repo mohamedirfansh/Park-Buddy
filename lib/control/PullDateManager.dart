@@ -10,6 +10,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'DatabaseManager.dart';
 
 /// Handles the logic to pull dates that are missing from the database and delete dates that are outside the window.
+/// {@category Control}
 class PullDateManager{
   /// Defines the timeframe that we maintain the historical data for. (i.e. pullWindow = 24; historical data for the past 24 hours will be maintained.)
   static final int _pullWindow = 7*24; // 1 week

@@ -10,6 +10,7 @@ import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 
 ///This class is responsible for providing CarparkInfo data, loaded from the CSV obtained from the Singapore government.
 ///This data is static information about the carparks like their addresses, LatLng info and unique carpark codes.
+/// {@category Control}
 class CarparkInfoManager {
   static List<CarparkInfo> _carparkList = [];
 
@@ -104,9 +105,7 @@ class CarparkInfoManager {
     return carparkList;
   }
 
-  /// Filters the master carparkList by distance from the given position and returns a filtered list
-  /// @param limitInKM the distance in kilometres to filter the list with
-  /// @param the LatLng object of the position to calculate the distance from.
+  /// Filters the master carparkList by [limitInKM] from the given [currentPos] and returns a filtered list
   static List<CarparkInfo> filterCarparksByDistance(
       num limitInKM, LatLng currentPos) {
     Geodesy geodesy = Geodesy();

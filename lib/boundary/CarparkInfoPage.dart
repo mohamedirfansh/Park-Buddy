@@ -10,6 +10,7 @@ import 'package:park_buddy/entity/CarparkInfo.dart';
 import 'package:park_buddy/entity/Histogram.dart';
 
 /// This class is dynamically filled for each Carpark when clicked on in the CarparkListView or MapViewWithSearch.
+/// {@category Boundary}
 class CarparkInfoPage extends StatefulWidget {
   ///The specific carpark code that is used to dynamically generate the info page
   final String carparkCode;
@@ -127,7 +128,6 @@ class _CarparkInfoPageState extends State<CarparkInfoPage> {
 
   ///Creates a widget for the histogram section of the carpark info page consisting of:
   /// 1) The histogram
-  ///@see Histogram
   Widget _carparkHistorySection(String carparkCode) {
     return Histogram(carparkCode);
   }

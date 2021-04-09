@@ -7,6 +7,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 
 ///This class is responsible for showing the historical carpark information for the previous week in an easy to read interface.
+///{@category Entity}
 class Histogram extends StatefulWidget {
   @override
   _HistogramState createState() => _HistogramState(carparkCode);
@@ -174,9 +175,7 @@ class _HistogramState extends State<Histogram> {
     );
   }
 
-  ///Converts the availability to a colour for each band of the histogram.
-  ///
-  /// @param availability The carpark's availability (Maximum 1.) Higher means more empty.
+  ///Converts the [availability] to a colour for each band of the histogram.
   Color _availabilityToColor(double availability){
       if (availability < 0.3) {
         return Colors.red;

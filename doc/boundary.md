@@ -1,0 +1,1 @@
+These classes encapsulate interaction with external actors (users or external systems).

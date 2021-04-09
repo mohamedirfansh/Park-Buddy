@@ -2,6 +2,7 @@ import 'package:location/location.dart';
 
 
 ///The class responsible for all location queries.
+/// {@category Control}
 class LocationManager {
   ///Used when user is searching for a destination other than their own.
   static LocationData _intendedLocation;

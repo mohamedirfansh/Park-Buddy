@@ -8,6 +8,7 @@ import 'package:park_buddy/control/CarparkListManager.dart';
 import 'package:park_buddy/control/LocationManager.dart';
 
 ///This view displays all the carparks that the user has searched for in a neat list view.
+/// {@category Boundary}
 class CarparkListView extends StatefulWidget {
   @override
   _CarparkListViewState createState() => _CarparkListViewState();

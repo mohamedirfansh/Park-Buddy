@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 /// Stores a carpark's availability information at a given time.
-/// (@category Entity)
+/// {@category Entity}
 class CarparkAvailability {
   /// Total number of lots of type H
   int totalLotsH;
@@ -47,10 +47,9 @@ class CarparkAvailability {
     this.updateDatetime,
     this.timestamp,
   });
-  /// Factory method to create a CarparkAvailability object from a json mapping
+  /// Constructor for the CarparkAvailability object from [json] containing [CarparkAvailability] fields, retrieved at [timestamp].
   ///
-  /// @param json The Map<String, dynamic> that contains CarparkAvailability fields.
-  /// @param timestamp The timestamp at which the json was obtained from the API.
+  /// Factory method for abstract instantiation.
   factory CarparkAvailability.fromJson(Map<String, dynamic> json, String timestamp) {
     final dateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
     DateTime date = dateFormat.parse(timestamp, true).subtract(Duration(hours:8));
@@ -90,11 +89,9 @@ class CarparkAvailability {
     );
   }
 
-  ///Constructor for the CarparkAvailabiltiy object from JSON.
-  ///Non-factory method used in concrete instantiation
+  ///Constructor for the CarparkAvailabiltiy object from [json] containing [CarparkAvailability] fields, retrieved at [timestamp].
   ///
-  /// @param json The Map<String, dynamic> that contains CarparkAvailability fields.
-  /// @param timestamp The timestamp at which the json was obtained from the API.
+  ///Non-factory method used in concrete instantiation
   CarparkAvailability.createFromJson(Map<String, dynamic> json, DateTime timestamp) {
     final dateFormat = DateFormat('yyyy-MM-ddThh:mm:ss');
     int totalH=0, totalC=0, totalY=0;

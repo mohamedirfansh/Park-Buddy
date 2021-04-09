@@ -1,3 +1,5 @@
+///Enum for the types of parking availiability for carparks.
+///{@category Entity}
 enum ShortTermParkingAvailability {
   unavailable,
   wholeDay,
