@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:park_buddy/control/DatabaseManager.dart';
 import 'package:park_buddy/control/PullDateManager.dart';
-import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -61,7 +60,7 @@ class _HistogramState extends State<Histogram> {
   }
 
   Widget _histogram() {
-    DateTime now = DateTime.now().toUtc().add(Duration(hours:8));
+    DateTime now = DateTime.now();
     int day = now.day;
     int month = now.month;
     int year = now.year;
@@ -208,7 +207,7 @@ class _HistogramState extends State<Histogram> {
   Future _getHistogramData(String carparkCode) async {
     await PullDateManager.pullMissingDates();
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
-    print(data['Today'].length);
+    //print(data['Today'].length);
     //data['Today'].forEach((e) => print(DateTime.fromMillisecondsSinceEpoch(e.timestamp)));
     /*
     switch (DateTime.now().weekday) {
