@@ -19,26 +19,52 @@ class _HistogramState extends State<Histogram> {
   String selectedDay = 'Today';
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              _dropdownMenu(),
-            ],
-          )
+    return FutureBuilder(
+        future: PullDateManager.pullMissingDates(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Column(
+              children: [
+                Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                        _dropdownMenu(),
+                      ],
+                    )
+                ),
+                _histogram()
+              ],
+            );
+          } else return ValueListenableBuilder(
+              valueListenable: PullDateManager.progressNotifier,
+              child: _loading(),
+          builder: (BuildContext context, double progress, Widget child) {
+            return Container (
+                child: LinearProgressIndicator(
+                  value: progress,
+                ),
+            );
+          }
+          );
+        }
+    );
+  }
+
+  Widget _loading() {
+    return Container(
+        child: LinearProgressIndicator(
+          value: 0,
         ),
-        _histogram()
-      ],
     );
   }
 
   Widget _histogram() {
-    int day = 0;
-    int month = 0;
-    int year = 0;
+    DateTime now = DateTime.now().toUtc().add(Duration(hours:8));
+    int day = now.day;
+    int month = now.month;
+    int year = now.year;
     return FutureBuilder(
         future: _getHistogramData(carparkCode),
         builder: (context, snapshot) {
@@ -48,6 +74,13 @@ class _HistogramState extends State<Histogram> {
                 series: <ChartSeries>[
                   ColumnSeries<dynamic, DateTime>(
                     dataSource: snapshot.data[selectedDay],
+                    trendlines:<Trendline>[
+                      Trendline(
+                        type: TrendlineType.movingAverage,
+                        color: Colors.black,
+                        width: 3,
+                      )
+                    ],
                     xValueMapper: (dynamic carpark, _) {
                       DateTime val = DateTime.fromMillisecondsSinceEpoch(carpark.timestamp);
                       day = val.day;
@@ -83,21 +116,20 @@ class _HistogramState extends State<Histogram> {
                   minorGridLines: MinorGridLines(
                       width: 0
                   ),
-                    /*
-                    plotBands: <PlotBand>[
+                    plotBands: selectedDay == "Today" ? <PlotBand>[
                       PlotBand(
                         isVisible: true,
                         start: DateTime(
-                          DateTime.now().year,
-                          DateTime.now().month,
-                          DateTime.now().day,
-                          DateTime.now().hour
+                            now.year,
+                            now.month,
+                            now.day,
+                            now.hour
                         ),
                         end: DateTime(
-                            DateTime.now().year,
-                            DateTime.now().month,
-                            DateTime.now().day,
-                            DateTime.now().hour
+                            now.year,
+                            now.month,
+                            now.day,
+                            now.hour
                         ),
                         text: 'Current time',
                         verticalTextPadding:'40%',
@@ -107,12 +139,11 @@ class _HistogramState extends State<Histogram> {
                         textAngle: 0,
                         borderColor: Colors.lightBlue
                       )
-
-                    ]
-
-                     */
+                    ] : null,
                 ),
                 primaryYAxis: NumericAxis(
+                  minimum: 0,
+                  maximum: 100,
                   labelFormat: '{value}% empty',
                   majorGridLines: MajorGridLines(
                     width: 0,
@@ -129,7 +160,8 @@ class _HistogramState extends State<Histogram> {
           } else return Container(child: SpinKitRing(
             color: Colors.cyan[300],
             size: 50.0,
-          ),);
+          ),
+          );
         }
     );
   }
@@ -160,21 +192,24 @@ class _HistogramState extends State<Histogram> {
     );
   }
 
+  /*
   List<dynamic> _filterCarparkAvailability(List<dynamic> carparkList) {
     /*carparkList.forEach( (carpark) {
       /*
         if (carpark.timestamp < DateTime.now().millisecondsSinceEpoch - Duration(days: 1).inMilliseconds){
-          carpark.timestamp += Duration(days: 7).inMilliseconds;
+          carpark.timestamp += Duration(days: 1).inMilliseconds;
         }
         */
     });*/
     return carparkList;
   }
+   */
 
   Future _getHistogramData(String carparkCode) async {
     await PullDateManager.pullMissingDates();
-
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
+    print(data['Today'].length);
+    //data['Today'].forEach((e) => print(DateTime.fromMillisecondsSinceEpoch(e.timestamp)));
     /*
     switch (DateTime.now().weekday) {
       case 1:
