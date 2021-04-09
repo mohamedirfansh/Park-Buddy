@@ -3,6 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:semaphore/semaphore.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
 
 import 'DatabaseManager.dart';
 
@@ -49,13 +52,15 @@ class PullDateManager{
     try {
       await _sm.acquire();
       int lastDate = await getDate();
-
-      final DateTime now = new DateTime.now(); // convert to SGT
-      final DateTime date = DateTime.fromMillisecondsSinceEpoch(lastDate);
+      tz.initializeTimeZones();
+      final locationSG = tz.getLocation('Asia/Singapore');
+      final DateTime now = tz.TZDateTime.now(locationSG);
+      //final DateTime now = new DateTime.now(); // convert to SGT
+      final DateTime date = tz.TZDateTime.fromMillisecondsSinceEpoch(locationSG, lastDate);
 
       final Duration delta = Duration(
           minutes: 30); // round to nearest 30 minutes
-      DateTime nearestHour = DateTime.fromMillisecondsSinceEpoch(
+      DateTime nearestHour = tz.TZDateTime.fromMillisecondsSinceEpoch(locationSG,
           now.millisecondsSinceEpoch -
               now.millisecondsSinceEpoch % delta.inMilliseconds);
       if (nearestHour.minute == 0)
@@ -71,10 +76,11 @@ class PullDateManager{
           : difference; // if difference >= pullWindow, means last pull was outside the window, and we need to do a complete pull.
       if (pulls >= _pullWindow) await DatabaseManager.deleteAllCarparkBefore(
           now); // delete all records if need to do a complete pull
-      else
+      else {
         await DatabaseManager.deleteAllCarparkBefore(
             nearestHour.subtract(Duration(hours: _pullWindow)).add(Duration(
-                minutes: 15))); // delete all records outside the window otherwise
+                minutes: 15)));
+      }// delete all records outside the window otherwise
       List<DateTime> pullList = <DateTime>[];
       if (pulls > 0) {
         pullList.add(nearestHour);
@@ -86,7 +92,6 @@ class PullDateManager{
           dec = dec.subtract(Duration(hours: 1));
           pullList.add(dec);
         }
-        print("Pulling ${pullList.length} items");
         try {
           var list = (pullList.map((e) =>
               DatabaseManager.pullCarparkAvailability(e,
