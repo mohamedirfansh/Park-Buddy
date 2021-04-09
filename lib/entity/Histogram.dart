@@ -242,34 +242,12 @@ class _HistogramState extends State<Histogram> {
   Future _getHistogramData(String carparkCode) async {
     await PullDateManager.pullMissingDates();
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
-    switch (DateTime.now().toUtc().weekday) {
-      case 1:
-        data['Mon'] = _filterCarparkAvailability(data['Mon']);
-        break;
-      case 2:
-        data['Tues'] = _filterCarparkAvailability(data['Tues']);
-        break;
-      case 3:
-        data['Wed'] = _filterCarparkAvailability(data['Wed']);
-        break;
-      case 4:
-        data['Thurs'] = _filterCarparkAvailability(data['Thurs']);
-        break;
-      case 5:
-        data['Fri'] = _filterCarparkAvailability(data['Fri']);
-        break;
-      case 6:
-        data['Sat'] = _filterCarparkAvailability(data['Sat']);
-        break;
-      case 7:
-        data['Sun'] = _filterCarparkAvailability(data['Sun']);
-        break;
-    }
-    return data;
+      data[_getCurrentDayFromDateTime()] = _filterCarparkAvailability(data[_getCurrentDayFromDateTime()]);
+
   }
 
   static String _getCurrentDayFromDateTime() {
-    switch (DateTime.now().weekday) {
+    switch (DateTime.now().toUtc().weekday) {
       case 1:
         return 'Mon';
         break;
