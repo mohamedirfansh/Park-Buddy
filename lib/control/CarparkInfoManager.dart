@@ -26,7 +26,7 @@ class CarparkInfoManager {
     //final res = const CsvToListConverter().convert(carparkData);
     const d = const FirstOccurrenceSettingsDetector(eols: ['\r\n', '\n']);
     List<List<dynamic>> res =
-        const CsvToListConverter(csvSettingsDetector: d).convert(carparkData);
+    const CsvToListConverter(csvSettingsDetector: d).convert(carparkData);
 
     for (var i = 1; i < res.length; i++) {
       CarparkType carparkType;
@@ -102,7 +102,7 @@ class CarparkInfoManager {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CarparkInfoManager && runtimeType == other.runtimeType;
+          other is CarparkInfoManager && runtimeType == other.runtimeType;
 
   @override
   int get hashCode => 0;
@@ -115,8 +115,8 @@ class CarparkInfoManager {
     }
     return dataList
         .where((carpark) =>
-            geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) <
-            limitInKM * 1000)
+    geodesy.distanceBetweenTwoGeoPoints(carpark.latlng, currentPos) <
+        limitInKM * 1000)
         .toList();
   }
 }

@@ -6,13 +6,13 @@ import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 
 class CarparkInfo {
   CarparkInfo(
-    this._carparkCode,
-    this._address,
-    this._latlng,
-    this._carparkType,
-    this._carparkPaymentMethod,
-    this._shortTermParking,
-  );
+      this._carparkCode,
+      this._address,
+      this._latlng,
+      this._carparkType,
+      this._carparkPaymentMethod,
+      this._shortTermParking,
+      );
 
   final String _carparkCode;
   final String _address;
