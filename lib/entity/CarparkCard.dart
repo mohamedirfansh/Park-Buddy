@@ -4,6 +4,7 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
 ///This is a UI class for showing carparks in the CarparkListView using the data provided in the constructor.
+///{@category Entity}
 class CarparkCard extends StatelessWidget {
   final CarparkInfo carpark;
   final CarparkAvailability carparkAvailability;

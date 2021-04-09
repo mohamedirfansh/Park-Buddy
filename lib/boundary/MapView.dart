@@ -14,6 +14,7 @@ import 'package:park_buddy/control/CarparkInfoManager.dart';
 import 'package:park_buddy/control/ScreenManager.dart';
 
 ///This class displays the map view, including the carpark markers that represent carparks near the user.
+/// {@category Boundary}
 class MapView extends StatefulWidget {
   MapView({Key key}) : super(key: key);
   @override

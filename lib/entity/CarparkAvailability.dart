@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 /// Stores a carpark's availability information at a given time.
-/// (@category Entity)
+/// {@category Entity}
 class CarparkAvailability {
   /// Total number of lots of type H
   int totalLotsH;

@@ -7,6 +7,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 
 ///This class is responsible for showing the historical carpark information for the previous week in an easy to read interface.
+///{@category Entity}
 class Histogram extends StatefulWidget {
   @override
   _HistogramState createState() => _HistogramState(carparkCode);

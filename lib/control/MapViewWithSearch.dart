@@ -10,6 +10,7 @@ import 'package:park_buddy/boundary/PlaceService.dart';
 import 'LocationManager.dart';
 
 ///The control class that handles the location searching. Comprises of the mapview as well as the autocompleting search bar.
+/// {@category Control}
 class MapViewWithSearch extends StatefulWidget {
   @override
   _MapViewWithSearchState createState() => _MapViewWithSearchState();
@@ -68,7 +69,7 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
       physics: const BouncingScrollPhysics(),
       axisAlignment: isPortrait ? 0.0 : -1.0,
       openAxisAlignment: 0.0,
-      maxWidth: isPortrait ? 600 : 500,
+      width: isPortrait ? 600 : 500,
       debounceDelay: const Duration(milliseconds: 500),
       clearQueryOnClose: false,
       transition: SlideFadeFloatingSearchBarTransition(),

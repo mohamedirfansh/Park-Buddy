@@ -1,0 +1,1 @@
+These classes ensures the processing required for the execution of a use-case and its business logic, and coordinates, sequences controls other objects involved in the use-case.

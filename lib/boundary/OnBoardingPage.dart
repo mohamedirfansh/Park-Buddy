@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
 ///Displays screenshots of the app with instructions to show how to use the app.
+/// {@category Boundary}
 class OnBoardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SafeArea(
@@ -44,7 +45,6 @@ class OnBoardingPage extends StatelessWidget {
           onSkip: () => goToHome(context),
           next: Icon(Icons.arrow_forward),
           dotsDecorator: getDotDecoration(),
-          globalBackgroundColor: Color(0xFF06E2B2),
         ),
       );
 

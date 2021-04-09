@@ -10,6 +10,7 @@ import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 
 ///This class is responsible for providing CarparkInfo data, loaded from the CSV obtained from the Singapore government.
 ///This data is static information about the carparks like their addresses, LatLng info and unique carpark codes.
+/// {@category Control}
 class CarparkInfoManager {
   static List<CarparkInfo> _carparkList = [];
 

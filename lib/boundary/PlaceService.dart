@@ -4,7 +4,7 @@ import 'package:geodesy/geodesy.dart';
 import 'package:http/http.dart';
 
 ///The suggestion class. The placeID is used later when the user clicks on a suggestion for us to query for the suggestion's location information
-///@see getPlaceLatLngFromId
+/// @see getPlaceLatLngFromId
 class Suggestion {
   final String placeId;
   final String description;
@@ -18,6 +18,7 @@ class Suggestion {
 }
 
 ///This class provides access to the Google Places API. This API is responsible for the autocomplete suggestions when the user is searching for location with the search bar.
+///{@category Boundary}
 class PlaceApiProvider {
   final client = Client();
 
@@ -27,12 +28,13 @@ class PlaceApiProvider {
   final apiKey = 'AIzaSyAZgPwhId1JCrLpMzgCfPABeGYV8Fkso-U';
 
   ///Fetches suggestions using the Google Places API. This search is done in the device's local language.
+  ///
   ///@param input The string input from the search bar
   ///@param lang The language code that the phone uses.
   Future<List<Suggestion>> fetchSuggestions(String input, String lang) async {
     final request =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&language=$lang&components=country:sg&key=$apiKey&sessiontoken=$sessionToken';
-    final response = await client.get(request);
+    final response = await client.get(Uri.parse(request));
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       if (result['status'] == 'OK') {
@@ -56,7 +58,7 @@ class PlaceApiProvider {
   Future<LatLng> getPlaceLatLngFromId(String placeId) async {
     final request =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=geometry/location&key=$apiKey&sessiontoken=$sessionToken';
-    final response = await client.get(request);
+    final response = await client.get(Uri.parse(request));
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);

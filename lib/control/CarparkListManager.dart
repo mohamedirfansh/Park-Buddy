@@ -10,6 +10,7 @@ import 'package:park_buddy/entity/CarparkCard.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
 /// Handles list construction for CarparkListView
+/// {@category Control}
 class CarparkListManager {
 
   ///Handles the building logic for getting a list of carparks and their availability.

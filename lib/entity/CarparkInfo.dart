@@ -5,6 +5,7 @@ import 'package:park_buddy/entity/CarparkType.dart';
 import 'package:park_buddy/entity/ShortTermParkingAvailability.dart';
 
 ///This entity class holds static information about a carpark.
+///{@category Entity}
 class CarparkInfo {
   CarparkInfo(
     this._carparkCode,

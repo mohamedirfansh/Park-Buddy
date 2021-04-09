@@ -6,6 +6,7 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'LocationManager.dart';
 
 ///This control class is responsible for displaying the appropriate screens by calling the right route functions.
+/// {@category Control}
 class ScreenManager {
   ///Based on the name of the route, generates a route to push on the Navigator.
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -20,7 +21,7 @@ class ScreenManager {
         break;
       case '/multitabview':
         ///The multitab view consists of both the MapViewWithSearch and the CarparkListView.
-        return MaterialPageRoute(builder: (_) => MultiTabView());
+        return MaterialPageRoute(builder: (_) => TabsManager());
         break;
       default:
         ///Default Error route.

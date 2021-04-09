@@ -3,6 +3,7 @@ import 'package:park_buddy/boundary/CarparkListView.dart';
 import 'package:park_buddy/control/MapViewWithSearch.dart';
 
 ///Entity class representing each tab in our tab view
+///{@category Entity}
 class TabNavigationItem {
   final Widget page;
   final String title;

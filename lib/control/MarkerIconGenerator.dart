@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 
 ///A marker icon generator class. As the GoogleMaps marker class only accepts a BitMap Descriptor, we use this class to turn our Icons classes to BitMapDescriptors.
+/// {@category Control}
 class MarkerGenerator {
   final _markerSize;
   double _circleStrokeWidth;

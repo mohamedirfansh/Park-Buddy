@@ -7,6 +7,7 @@ import 'package:park_buddy/entity/AvailabilityDatabase.dart';
 import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 ///The class to interface with the device's local SQL database.
+/// {@category Control}
 class DatabaseManager {
   static final _table = "AvailabilityTable";
   static final _sm = LocalSemaphore(10);

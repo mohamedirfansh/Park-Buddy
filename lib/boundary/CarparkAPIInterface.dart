@@ -7,6 +7,7 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 import 'package:park_buddy/entity/CarparkInfo.dart';
 
 /// This class provides static methods to access carpark availability information from the API.
+/// {@category Boundary}
 class CarparkAPIInterface {
   static final dateFormat = DateFormat('yyyy-MM-ddTHH%3Amm%3Ass');
   static final jsonDateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
@@ -19,7 +20,7 @@ class CarparkAPIInterface {
     String d = dateFormat.format(dateTime);
     var url =
         "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final list = json.decode(response.body);
       final items = list['items'][0];
@@ -43,7 +44,7 @@ class CarparkAPIInterface {
     String d = dateFormat.format(dateTime);
     var url =
         "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final list = json.decode(response.body);
       final info = list['items'][0]['carpark_data']
@@ -75,7 +76,7 @@ class CarparkAPIInterface {
     String d = dateFormat.format(dateTime);
     var url =
         "https://api.data.gov.sg/v1/transport/carpark-availability?date_time=$d";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
 
       final rawCarparkData = json.decode(

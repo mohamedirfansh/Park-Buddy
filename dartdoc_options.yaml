@@ -1,0 +1,20 @@
+dartdoc:
+  categories:
+    "Boundary":
+      name: Boundary
+      markdown: doc/boundary.md
+    "Control":
+      markdown: doc/control.md
+      name: Control
+    "Entity":
+      markdown: doc/entity.md
+      name: Entity
+  categoryOrder: ["Boundary", "Control", "Entity"]
+  nodoc: ['lib/main.dart']
+  showUndocumentedCategories: true
+  ignore:
+    - ambiguous-doc-reference
+  errors:
+    - unresolved-doc-reference
+  warnings:
+    - tool-error
