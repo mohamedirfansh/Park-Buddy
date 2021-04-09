@@ -10,21 +10,21 @@ class OnBoardingPage extends StatelessWidget {
           pages: [
             PageViewModel(
               title: 'Parking lots',
-              body: 'Find parking lots near you',
+              body: 'Tap on carpark pin to view address and lot type',
               image: buildImage('assets/images/carparks_near.png'),
               decoration: getPageDecoration(),
             ),
             PageViewModel(
               title: 'Search destination',
               body:
-                  'Search for a location to find carparks near your destination',
+              'Search for a location to find carparks near your destination',
               image: buildImage('assets/images/search.png'),
               decoration: getPageDecoration(),
             ),
             PageViewModel(
               title: 'Select the perfect parking lot',
               body:
-                  'View more details about the carpark like lot availability, distance & historic availability',
+              'Tap on the carpark pin label or card in List View to view carpark info like lot availability, distance & historic availability',
               image: buildImage('assets/images/info_page.png'),
               decoration: getPageDecoration(),
             ),
