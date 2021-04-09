@@ -218,7 +218,7 @@ class _HistogramState extends State<Histogram> {
 
   ///Inserts a PlotBand for the current day of the week. If we are viewing another day, return null.
   List<PlotBand> insertCurrentTimePlotBand(String selectedDay){
-    DateTime now = DateTime.now().toUtc().add(Duration(hours:8));
+    DateTime now = DateTime.now();
     if (selectedDay == _getCurrentDayFromDateTime()) {
       return [
         PlotBand(
