@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:park_buddy/control/DatabaseManager.dart';
 import 'package:park_buddy/control/PullDateManager.dart';
-import 'package:semaphore/semaphore.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -16,23 +15,47 @@ class Histogram extends StatefulWidget {
 class _HistogramState extends State<Histogram> {
   _HistogramState(this.carparkCode);
   final carparkCode;
-  static final _sm = LocalSemaphore(1);
   String selectedDay = _getCurrentDayFromDateTime();
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              _dropdownMenu(),
-            ],
-          )
-        ),
-        _histogram()
-      ],
+    return FutureBuilder(
+        future: PullDateManager.pullMissingDates(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Column(
+              children: [
+                Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                        _dropdownMenu(),
+                      ],
+                    )
+                ),
+                _histogram()
+              ],
+            );
+          } else return ValueListenableBuilder(
+              valueListenable: PullDateManager.progressNotifier,
+              child: _loading(),
+              builder: (BuildContext context, double progress, Widget child) {
+                return Container (
+                  child: LinearProgressIndicator(
+                    value: progress,
+                  ),
+                );
+              }
+          );
+        }
+    );
+  }
+
+  Widget _loading() {
+    return Container(
+      child: LinearProgressIndicator(
+        value: 0,
+      ),
     );
   }
 
@@ -166,12 +189,7 @@ class _HistogramState extends State<Histogram> {
   }
 
   Future _getHistogramData(String carparkCode) async {
-    try {
-      await _sm.acquire();
-      await PullDateManager.pullMissingDates();
-    } finally {
-      _sm.release();
-    }
+    await PullDateManager.pullMissingDates();
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
     switch (DateTime.now().toUtc().add(Duration(hours:8)).weekday) {
       case 1:
