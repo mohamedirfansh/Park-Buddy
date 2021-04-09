@@ -86,7 +86,7 @@ class CarparkAvailability {
       lotsAvailableH: availH,
       lotsAvailableC: availC,
       lotsAvailableY: availY,
-      updateDatetime: dateFormat.parse(json["update_datetime"]).subtract(Duration(hours:8)).millisecondsSinceEpoch,
+      updateDatetime: dateFormat.parse(json["update_datetime"], true).subtract(Duration(hours:8)).millisecondsSinceEpoch,
     );
   }
 

@@ -9,13 +9,17 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 ///The class to interface with the device's local SQL database.
 class DatabaseManager {
   static final _table = "AvailabilityTable";
-  static final sm = LocalSemaphore(40);
-  
+  static final _sm = LocalSemaphore(10);
+
   /// Pull Carpark Availability API and convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date,
       {bool insertIntoDatabase = false}) async {
-    var items = await CarparkAPIInterface.getCarparkMap(date);
-    return await _availabilityFromJson(items, insertIntoDatabase);
+    try {
+      var items = await CarparkAPIInterface.getCarparkMap(date);
+      return await _availabilityFromJson(items, insertIntoDatabase);
+    } catch(e) {
+      print("cannot connect");
+    }
   }
 
   /// Private method to convert retrieved carpark availability json into CarparkAvailability objects
@@ -143,7 +147,6 @@ class DatabaseManager {
       'Sun': [],
     };
 
-
     //Sort the list to the map
     convertedResult.forEach((element) {
       DateTime entryDate = DateTime.fromMillisecondsSinceEpoch(element.timestamp);
@@ -206,10 +209,10 @@ class DatabaseManager {
   }
 
   ///Insert carparks into database as a batch. Uses a semaphore to prevent concurrent insertion from multiple sources.
+  static int count = 0;
   static Future batchInsertCarparks(List<CarparkAvailability> carparks) async {
     final dbClient = await AvailabilityDatabase.instance.database;
     final batch = dbClient.batch();
-
     /// Batch insert
     for (var i = 0; i < carparks.length; i++) {
       if (carparks[i] != null) {
@@ -217,10 +220,12 @@ class DatabaseManager {
       }
     }
     try {
-      await sm.acquire();
+      await _sm.acquire();
       await batch.commit(noResult: true);
+      print("commited $count");
+      count++;
     } finally {
-      sm.release();
+      _sm.release();
     }
   }
 

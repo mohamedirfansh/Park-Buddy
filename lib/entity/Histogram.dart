@@ -25,24 +25,36 @@ class _HistogramState extends State<Histogram> {
   ///Builds a histogram widget with a dropdown menu to change the day being viewed.
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              _dropdownMenu(),
-            ],
-          )
-        ),
-        _histogram()
-      ],
+      return Column(
+        children: [
+          Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  _dropdownMenu(),
+                ],
+              )
+          ),
+          _histogram()
+        ],
+      );
+  }
+
+  Widget _loading() {
+    return Container(
+      child: LinearProgressIndicator(
+        value: 0,
+      ),
     );
   }
 
   ///The histogram itself.
   Widget _histogram() {
+    DateTime now = DateTime.now();
+    int day = now.day;
+    int month = now.month;
+    int year = now.year;
     return FutureBuilder(
         future: _getHistogramData(carparkCode),
         builder: (context, snapshot) {
@@ -52,8 +64,22 @@ class _HistogramState extends State<Histogram> {
                 series: <ChartSeries>[
                   ColumnSeries<dynamic, DateTime>(
                     dataSource: snapshot.data[selectedDay],
+                    trendlines:<Trendline>[
+                      Trendline(
+                        type: TrendlineType.movingAverage,
+                        backwardForecast: 10,
+                        dashArray: <double>[5,5],
+                        color: Colors.black,
+                        width: 3,
+                        opacity: 0.6,
+                      )
+                    ],
                     xValueMapper: (dynamic carpark, _) {
-                      return DateTime.fromMillisecondsSinceEpoch(carpark.timestamp);
+                      DateTime val = DateTime.fromMillisecondsSinceEpoch(carpark.timestamp);
+                      day = val.day;
+                      month = val.month;
+                      year = val.year;
+                      return val;
                     },
                     yValueMapper: (dynamic carpark, _) {
                       return 100*(carpark.lotsAvailableC/carpark.totalLotsC);
@@ -63,36 +89,86 @@ class _HistogramState extends State<Histogram> {
                           carpark.totalLotsC;
                       return _availabilityToColor(fraction);
                     },
-                    width: 0.8,
+                    width: 0.8, // Width of the columns
+                    // animationDuration: 1000,// Spacing between the column
                   )
                 ],
                 primaryXAxis: DateTimeAxis(
+                  minimum:DateTime(year,month,day,0),
+                  maximum:DateTime(year,month,day,24),
+
                   majorGridLines: MajorGridLines(
-                      width: 0,
+                    width: 0,
                   ),
                   minorGridLines: MinorGridLines(
                       width: 0
                   ),
-                    plotBands: insertCurrentTimePlotBand(selectedDay),
+                  plotBands: selectedDay == _getCurrentDayFromDateTime() ? <PlotBand>[
+                    PlotBand(
+                        isVisible: true,
+                        start: DateTime(
+                            now.year,
+                            now.month,
+                            now.day,
+                            now.hour
+                        ),
+                        end: DateTime(
+                            now.year,
+                            now.month,
+                            now.day,
+                            now.hour
+                        ),
+                        text: 'Current time',
+                        verticalTextPadding:'40%',
+                        horizontalTextPadding: '-15%',
+                        textStyle: TextStyle(color: Colors.black, fontSize: 16),
+                        borderWidth: 2,
+                        textAngle: 0,
+                        borderColor: Colors.lightBlue
+                    )
+                  ] : null,
                 ),
                 primaryYAxis: NumericAxis(
-                    labelFormat: '{value}% empty',
-                    majorGridLines: MajorGridLines(
-                      width: 0,
-                    ),
-                    minorGridLines: MinorGridLines(
-                        width: 0
-                    ),
+                  minimum: 0,
+                  maximum: 100,
+                  labelFormat: '{value}% empty',
+                  majorGridLines: MajorGridLines(
+                    width: 0,
+                  ),
+                  minorGridLines: MinorGridLines(
+                      width: 0
+                  ),
                 ),
                 backgroundColor: Colors.transparent,
                 plotAreaBackgroundColor: Colors.transparent,
 
               ),
             );
-          } else return Container( child: SpinKitRing(
-            color: Colors.cyan[300],
-            size: 50.0,
-            ),
+          } else return Container(
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 10),
+
+              child: Column(
+                children: [
+                  SpinKitRing(
+                    color: Colors.cyan[300],
+                    size: 50.0,
+                  ),
+                  Text("Loading carpark history...",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold),),
+                  ValueListenableBuilder(
+                  valueListenable: PullDateManager.progressNotifier,
+                  builder: (BuildContext context, double progress, Widget child) {
+                    return LinearProgressIndicator(
+                        value: progress,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan[300]),
+                        backgroundColor: Colors.white,
+                        minHeight: 10,
+                      );
+                  }),
+                  ],
+
+              )
           );
         }
     );
@@ -142,25 +218,28 @@ class _HistogramState extends State<Histogram> {
 
   ///Inserts a PlotBand for the current day of the week. If we are viewing another day, return null.
   List<PlotBand> insertCurrentTimePlotBand(String selectedDay){
+    DateTime now = DateTime.now().toUtc().add(Duration(hours:8));
     if (selectedDay == _getCurrentDayFromDateTime()) {
       return [
         PlotBand(
             isVisible: true,
             start: DateTime(
-                DateTime.now().year,
-                DateTime.now().month,
-                DateTime.now().day,
-                DateTime.now().hour
+                now.year,
+                now.month,
+                now.day,
+                now.hour,
+                now.minute
             ),
             end: DateTime(
-                DateTime.now().year,
-                DateTime.now().month,
-                DateTime.now().day,
-                DateTime.now().hour
+                now.year,
+                now.month,
+                now.day,
+                now.hour,
+                now.minute
             ),
             text: 'Current time',
             verticalTextPadding:'40%',
-            horizontalTextPadding: '-15%',
+            horizontalTextPadding: DateTime.now().hour < 12 ? '-15%': '15%',
             textStyle: TextStyle(color: Colors.black, fontSize: 16),
             borderWidth: 2,
             textAngle: 0,
@@ -179,6 +258,7 @@ class _HistogramState extends State<Histogram> {
           carpark.timestamp += Duration(days: 7).inMilliseconds;
         }
     });
+    carparkList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return carparkList;
   }
 
@@ -192,7 +272,7 @@ class _HistogramState extends State<Histogram> {
 
   ///Converts the int valeu of DateTime.now().weekday to a String for use in the Histogram.
   static String _getCurrentDayFromDateTime() {
-    switch (DateTime.now().weekday) {
+    switch (DateTime.now().toUtc().weekday) {
       case 1:
         return 'Mon';
         break;
