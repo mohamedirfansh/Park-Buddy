@@ -91,26 +91,26 @@ class _MapViewWithSearchState extends State<MapViewWithSearch> {
 
   FutureBuilder<List<Suggestion>> _autocompleteSuggestionBuilder(
       BuildContext context) {
-      return FutureBuilder(
-        future: apiClient.fetchSuggestions(
-            currentQuery, Localizations
-            .localeOf(context)
-            .languageCode),
-        builder: (context, snapshot) {
-          if (currentQuery == '') {
-            return _preSearchWidget();
-          }
-          if (snapshot.hasData == false) {
-            if (snapshot.connectionState == ConnectionState.done && snapshot.hasError)
-              return _errorResultsWidget();
-            return _searchLoadingWidget();
-          } else if (snapshot.data.length > 0) {
-            return _suggestionListViewWidget(snapshot);
-          } else {
-            return _emptyResultsWidget();
-          }
-        },
-      );
+    return FutureBuilder(
+      future: apiClient.fetchSuggestions(
+          currentQuery, Localizations
+          .localeOf(context)
+          .languageCode),
+      builder: (context, snapshot) {
+        if (currentQuery == '') {
+          return _preSearchWidget();
+        }
+        if (snapshot.hasData == false) {
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasError)
+            return _errorResultsWidget();
+          return _searchLoadingWidget();
+        } else if (snapshot.data.length > 0) {
+          return _suggestionListViewWidget(snapshot);
+        } else {
+          return _emptyResultsWidget();
+        }
+      },
+    );
   }
 
   Widget _preSearchWidget() {
