@@ -60,6 +60,10 @@ class _HistogramState extends State<Histogram> {
   }
 
   Widget _histogram() {
+    DateTime now = DateTime.now();
+    int day = now.day;
+    int month = now.month;
+    int year = now.year;
     return FutureBuilder(
         future: _getHistogramData(carparkCode),
         builder: (context, snapshot) {
@@ -69,8 +73,19 @@ class _HistogramState extends State<Histogram> {
                 series: <ChartSeries>[
                   ColumnSeries<dynamic, DateTime>(
                     dataSource: snapshot.data[selectedDay],
+                    trendlines:<Trendline>[
+                      Trendline(
+                        type: TrendlineType.movingAverage,
+                        color: Colors.black,
+                        width: 3,
+                      )
+                    ],
                     xValueMapper: (dynamic carpark, _) {
-                      return DateTime.fromMillisecondsSinceEpoch(carpark.timestamp);
+                      DateTime val = DateTime.fromMillisecondsSinceEpoch(carpark.timestamp);
+                      day = val.day;
+                      month = val.month;
+                      year = val.year;
+                      return val;
                     },
                     yValueMapper: (dynamic carpark, _) {
                       return 100*(carpark.lotsAvailableC/carpark.totalLotsC);
@@ -86,36 +101,65 @@ class _HistogramState extends State<Histogram> {
                         return Colors.amber;
                       } else return Colors.green;
                     },
-                    width: 0.8,
+                    width: 0.8, // Width of the columns
+                    // animationDuration: 1000,// Spacing between the column
                   )
                 ],
                 primaryXAxis: DateTimeAxis(
+                  minimum:DateTime(year,month,day,0),
+                  maximum:DateTime(year,month,day,24),
+
                   majorGridLines: MajorGridLines(
-                      width: 0,
+                    width: 0,
                   ),
                   minorGridLines: MinorGridLines(
                       width: 0
                   ),
-                    plotBands: insertCurrentTimePlotBand(selectedDay),
+                  plotBands: selectedDay == _getCurrentDayFromDateTime() ? <PlotBand>[
+                    PlotBand(
+                        isVisible: true,
+                        start: DateTime(
+                            now.year,
+                            now.month,
+                            now.day,
+                            now.hour
+                        ),
+                        end: DateTime(
+                            now.year,
+                            now.month,
+                            now.day,
+                            now.hour
+                        ),
+                        text: 'Current time',
+                        verticalTextPadding:'40%',
+                        horizontalTextPadding: '-15%',
+                        textStyle: TextStyle(color: Colors.black, fontSize: 16),
+                        borderWidth: 2,
+                        textAngle: 0,
+                        borderColor: Colors.lightBlue
+                    )
+                  ] : null,
                 ),
                 primaryYAxis: NumericAxis(
-                    labelFormat: '{value}% empty',
-                    majorGridLines: MajorGridLines(
-                      width: 0,
-                    ),
-                    minorGridLines: MinorGridLines(
-                        width: 0
-                    ),
+                  minimum: 0,
+                  maximum: 100,
+                  labelFormat: '{value}% empty',
+                  majorGridLines: MajorGridLines(
+                    width: 0,
+                  ),
+                  minorGridLines: MinorGridLines(
+                      width: 0
+                  ),
                 ),
                 backgroundColor: Colors.transparent,
                 plotAreaBackgroundColor: Colors.transparent,
 
               ),
             );
-          } else return Container( child: SpinKitRing(
+          } else return Container(child: SpinKitRing(
             color: Colors.cyan[300],
             size: 50.0,
-            ),
+          ),
           );
         }
     );
@@ -147,51 +191,20 @@ class _HistogramState extends State<Histogram> {
     );
   }
 
-  List<PlotBand> insertCurrentTimePlotBand(String selectedDay){
-    DateTime now = DateTime.now().toUtc().add(Duration(hours:8));
-    if (selectedDay == _getCurrentDayFromDateTime()) {
-      return [
-        PlotBand(
-            isVisible: true,
-            start: DateTime(
-                now.year,
-                now.month,
-                now.day,
-                now.hour
-            ),
-            end: DateTime(
-                now.year,
-                now.month,
-                now.day,
-                now.hour
-            ),
-            text: 'Current time',
-            verticalTextPadding:'40%',
-            horizontalTextPadding: '-15%',
-            textStyle: TextStyle(color: Colors.black, fontSize: 16),
-            borderWidth: 2,
-            textAngle: 0,
-            borderColor: Colors.lightBlue
-        )
-      ];
-    } else {
-      return null;
-    }
-  }
-
   List<dynamic> _filterCarparkAvailability(List<dynamic> carparkList) {
     carparkList.forEach( (carpark) {
-        if (carpark.timestamp < DateTime.now().toUtc().add(Duration(hours:8)).millisecondsSinceEpoch - Duration(days: 1).inMilliseconds){
+        if (carpark.timestamp < DateTime.now().millisecondsSinceEpoch - Duration(days: 1).inMilliseconds){
           carpark.timestamp += Duration(days: 7).inMilliseconds;
         }
     });
+    carparkList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return carparkList;
   }
 
   Future _getHistogramData(String carparkCode) async {
     await PullDateManager.pullMissingDates();
     Map<dynamic, dynamic> data = await DatabaseManager.getCarparkList(carparkCode);
-    switch (DateTime.now().toUtc().add(Duration(hours:8)).weekday) {
+    switch (DateTime.now().toUtc().weekday) {
       case 1:
         data['Mon'] = _filterCarparkAvailability(data['Mon']);
         break;
@@ -218,7 +231,7 @@ class _HistogramState extends State<Histogram> {
   }
 
   static String _getCurrentDayFromDateTime() {
-    switch (DateTime.now().toUtc().add(Duration(hours:8)).weekday) {
+    switch (DateTime.now().weekday) {
       case 1:
         return 'Mon';
         break;

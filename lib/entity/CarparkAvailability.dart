@@ -82,13 +82,13 @@ class CarparkAvailability {
       lotsAvailableH: availH,
       lotsAvailableC: availC,
       lotsAvailableY: availY,
-      updateDatetime: dateFormat.parse(json["update_datetime"]).subtract(Duration(hours:8)).millisecondsSinceEpoch,
+      updateDatetime: dateFormat.parse(json["update_datetime"], true).subtract(Duration(hours:8)).millisecondsSinceEpoch,
     );
   }
 
   // Constructor from json string (non factory method)
-  CarparkAvailability.createFromJson(Map<String, dynamic> json, DateTime timestamp) {
-    final dateFormat = DateFormat('yyyy-MM-ddThh:mm:ss');
+  CarparkAvailability.createFromJson(Map<String, dynamic> json, String timestamp) {
+    final dateFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
     int totalH=0, totalC=0, totalY=0;
     int availH=0, availC=0, availY=0;
     int numCarparkTypes = json["carpark_info"].length;
@@ -111,7 +111,7 @@ class CarparkAvailability {
       }
     }
 
-    this.timestamp = timestamp.subtract(Duration(hours:8)).millisecondsSinceEpoch;
+    this.timestamp = dateFormat.parse(timestamp,true).subtract(Duration(hours:8)).millisecondsSinceEpoch;
     this.carparkNumber = json["carpark_number"].toString();
     this.singleType = (numCarparkTypes == 1) ? 1 : 0;
     this.totalLotsH = totalH;

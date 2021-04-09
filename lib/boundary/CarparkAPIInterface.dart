@@ -52,7 +52,7 @@ class CarparkAPIInterface {
       } else if (info.length < 1) {
         throw Exception("Failed to retrieve Carpark API data");
       }
-      return CarparkAvailability.createFromJson(info.elementAt(0), dateTime);
+      return CarparkAvailability.createFromJson(info.elementAt(0), jsonDateFormat.format(dateTime));
     } else {
       print("error fetching api");
       print(response.statusCode);
@@ -79,7 +79,7 @@ class CarparkAPIInterface {
 
       final Map<String, CarparkAvailability> carparkAvailabilityMap = Map<String, CarparkAvailability>();
 
-      carparkList.forEach((carpark) => carparkAvailabilityMap[carpark["carpark_number"]] = CarparkAvailability.createFromJson(carpark, dateTime));
+      carparkList.forEach((carpark) => carparkAvailabilityMap[carpark["carpark_number"]] = CarparkAvailability.createFromJson(carpark, jsonDateFormat.format(dateTime)));
       return carparkAvailabilityMap;
     } else {
       throw Exception("Failed to retrieve Carpark API data");

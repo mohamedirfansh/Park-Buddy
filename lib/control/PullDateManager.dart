@@ -3,11 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:semaphore/semaphore.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
 
 import 'DatabaseManager.dart';
 
 /// Handles the logic to pull dates that are missing from the database and delete dates that are outside the window.
-class PullDateManager {
+class PullDateManager{
   /// Defines the timeframe that we maintain the historical data for. (i.e. pullWindow = 24; historical data for the past 24 hours will be maintained.)
   static final int _pullWindow = 7*24; // 1 week
   static ValueNotifier<double> progressNotifier = ValueNotifier(0);
@@ -49,14 +52,15 @@ class PullDateManager {
     try {
       await _sm.acquire();
       int lastDate = await getDate();
-
-      final DateTime now = new DateTime.now().toUtc().add(
-          Duration(hours: 8)); // convert to SGT
-      final DateTime date = DateTime.fromMillisecondsSinceEpoch(lastDate);
+      tz.initializeTimeZones();
+      final locationSG = tz.getLocation('Asia/Singapore');
+      final DateTime now = tz.TZDateTime.now(locationSG);
+      //final DateTime now = new DateTime.now(); // convert to SGT
+      final DateTime date = tz.TZDateTime.fromMillisecondsSinceEpoch(locationSG, lastDate);
 
       final Duration delta = Duration(
           minutes: 30); // round to nearest 30 minutes
-      DateTime nearestHour = DateTime.fromMillisecondsSinceEpoch(
+      DateTime nearestHour = tz.TZDateTime.fromMillisecondsSinceEpoch(locationSG,
           now.millisecondsSinceEpoch -
               now.millisecondsSinceEpoch % delta.inMilliseconds);
       if (nearestHour.minute == 0)
@@ -72,8 +76,11 @@ class PullDateManager {
           : difference; // if difference >= pullWindow, means last pull was outside the window, and we need to do a complete pull.
       if (pulls >= _pullWindow) await DatabaseManager.deleteAllCarparkBefore(
           now); // delete all records if need to do a complete pull
-      else
-        await DatabaseManager.deleteAllCarparkBefore(nearestHour.subtract(Duration(hours: _pullWindow)).add(Duration(minutes: 15))); // delete all records outside the window otherwise
+      else {
+        await DatabaseManager.deleteAllCarparkBefore(
+            nearestHour.subtract(Duration(hours: _pullWindow)).add(Duration(
+                minutes: 15)));
+      }// delete all records outside the window otherwise
       List<DateTime> pullList = <DateTime>[];
       if (pulls > 0) {
         pullList.add(nearestHour);
@@ -102,9 +109,9 @@ class PullDateManager {
           throw Exception("Cannot connect to API");
         }
       }
-      await saveDate(saved);
+      saveDate(saved);
     } finally {
-    _sm.release();
+      _sm.release();
     }
     return pulls;
   }
