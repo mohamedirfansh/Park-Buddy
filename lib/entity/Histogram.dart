@@ -18,37 +18,20 @@ class _HistogramState extends State<Histogram> {
   String selectedDay = _getCurrentDayFromDateTime();
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: PullDateManager.pullMissingDates(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Column(
-              children: [
-                Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                        _dropdownMenu(),
-                      ],
-                    )
-                ),
-                _histogram()
-              ],
-            );
-          } else return ValueListenableBuilder(
-              valueListenable: PullDateManager.progressNotifier,
-              child: _loading(),
-              builder: (BuildContext context, double progress, Widget child) {
-                return Container (
-                  child: LinearProgressIndicator(
-                    value: progress,
-                  ),
-                );
-              }
-          );
-        }
-    );
+      return Column(
+        children: [
+          Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text("Carpark History", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  _dropdownMenu(),
+                ],
+              )
+          ),
+          _histogram()
+        ],
+      );
   }
 
   Widget _loading() {
@@ -112,10 +95,31 @@ class _HistogramState extends State<Histogram> {
 
               ),
             );
-          } else return Container( child: SpinKitRing(
-            color: Colors.cyan[300],
-            size: 50.0,
-            ),
+          } else return Container(
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 10),
+
+              child: Column(
+                children: [
+                  SpinKitRing(
+                    color: Colors.cyan[300],
+                    size: 50.0,
+                  ),
+                  Text("Loading carpark history...",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold),),
+                  ValueListenableBuilder(
+                  valueListenable: PullDateManager.progressNotifier,
+                  builder: (BuildContext context, double progress, Widget child) {
+                    return LinearProgressIndicator(
+                        value: progress,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan[300]),
+                        backgroundColor: Colors.white,
+                        minHeight: 10,
+                      );
+                  }),
+                  ],
+
+              )
           );
         }
     );
@@ -157,17 +161,19 @@ class _HistogramState extends State<Histogram> {
                 now.year,
                 now.month,
                 now.day,
-                now.hour
+                now.hour,
+                now.minute
             ),
             end: DateTime(
                 now.year,
                 now.month,
                 now.day,
-                now.hour
+                now.hour,
+                now.minute
             ),
             text: 'Current time',
             verticalTextPadding:'40%',
-            horizontalTextPadding: '-15%',
+            horizontalTextPadding: DateTime.now().hour < 12 ? '-15%': '15%',
             textStyle: TextStyle(color: Colors.black, fontSize: 16),
             borderWidth: 2,
             textAngle: 0,
