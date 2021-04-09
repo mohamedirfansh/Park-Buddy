@@ -8,7 +8,7 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 class DatabaseManager {
   static final _table = "AvailabilityTable";
-  static final sm = LocalSemaphore(10);
+  static final sm = LocalSemaphore(1);
 
   /// Pull Carpark Availability API an convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date,
@@ -28,8 +28,8 @@ class DatabaseManager {
     var timestamp = items["timestamp"];
     var carparkData = items["carpark_data"];
 
-    var carparkList = List<CarparkAvailability>();
-    List returnList = List<Map<String, dynamic>>();
+    var carparkList = <CarparkAvailability>[];
+    List returnList = <Map<String, dynamic>>[];
     for (var x in carparkData) {
       CarparkAvailability item = CarparkAvailability.fromJson(x, timestamp);
       if (!duplicateSet.containsKey(item.carparkNumber)) {
