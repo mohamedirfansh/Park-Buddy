@@ -8,12 +8,16 @@ import 'package:park_buddy/entity/CarparkAvailability.dart';
 
 class DatabaseManager {
   static final _table = "AvailabilityTable";
-  static final _sm = LocalSemaphore(40);
+  static final _sm = LocalSemaphore(10);
   /// Pull Carpark Availability API an convert into CarparkAvailability objects.
   static Future<List<Map>> pullCarparkAvailability(DateTime date,
       {bool insertIntoDatabase = false}) async {
-    var items = await CarparkAPIInterface.getCarparkMap(date);
-    return await _availabilityFromJson(items, insertIntoDatabase);
+    try {
+      var items = await CarparkAPIInterface.getCarparkMap(date);
+      return await _availabilityFromJson(items, insertIntoDatabase);
+    } catch(e) {
+      print("cannot connect");
+    }
   }
 
   /// private method to convert retrieved carpark availability json into CarparkAvailability object
