@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the checkWindow method from the DatabaseManager class, for the Dart programming language.">
+  <title>checkWindow method - DatabaseManager class - DatabaseManager library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../static-assets/github.css">
+  <link rel="stylesheet" href="../../static-assets/styles.css">
+  <link rel="icon" href="../../static-assets/favicon.png">
+
+  
+</head>
+
+
+<body data-base-href="../../"
+      data-using-base-href="false">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">park_buddy</a></li>
+    <li><a href="../../control_DatabaseManager/control_DatabaseManager-library.html">DatabaseManager</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager-class.html">DatabaseManager</a></li>
+    <li class="self-crumb">checkWindow method</li>
+  </ol>
+  <div class="self-name">checkWindow</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">park_buddy</a></li>
+  <li><a href="../../control_DatabaseManager/control_DatabaseManager-library.html">DatabaseManager</a></li>
+  <li><a href="../../control_DatabaseManager/DatabaseManager-class.html">DatabaseManager</a></li>
+  <li class="self-crumb">checkWindow method</li>
+</ol>
+
+
+    <h5>DatabaseManager class</h5>
+    <ol>
+
+    <li class="section-title"><a href="../../control_DatabaseManager/DatabaseManager-class.html#constructors">Constructors</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/DatabaseManager.html">DatabaseManager</a></li>
+
+
+    <li class="section-title inherited">
+      <a href="../../control_DatabaseManager/DatabaseManager-class.html#instance-properties">Properties</a>
+    </li>
+    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></li>
+    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>
+
+    <li class="section-title inherited"><a href="../../control_DatabaseManager/DatabaseManager-class.html#instance-methods">Methods</a></li>
+    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
+
+    <li class="section-title inherited"><a href="../../control_DatabaseManager/DatabaseManager-class.html#operators">Operators</a></li>
+    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+    <li class="section-title"><a href="../../control_DatabaseManager/DatabaseManager-class.html#static-properties">Static properties</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/count.html">count</a></li>
+
+    <li class="section-title"><a href="../../control_DatabaseManager/DatabaseManager-class.html#static-methods">Static methods</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/batchInsertCarparks.html">batchInsertCarparks</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/checkWindow.html">checkWindow</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/deleteAllCarparkBefore.html">deleteAllCarparkBefore</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/deleteCarpark.html">deleteCarpark</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/deleteCarparkBefore.html">deleteCarparkBefore</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/getCarparkList.html">getCarparkList</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/getCountOfEntries.html">getCountOfEntries</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/insertCarpark.html">insertCarpark</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/printAllCarparks.html">printAllCarparks</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/pullCarparkAvailability.html">pullCarparkAvailability</a></li>
+    <li><a href="../../control_DatabaseManager/DatabaseManager/updateCarpark.html">updateCarpark</a></li>
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">checkWindow</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
+<span class="name ">checkWindow</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="checkWindow-param-start"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a></span> <span class="parameter-name">start</span>, </span></li>
+<li><span class="parameter" id="checkWindow-param-end"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a></span> <span class="parameter-name">end</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Debugging method to check the entries within a specific time window.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">static Future checkWindow(DateTime start, DateTime end) async {
+  int startEpoch = start.millisecondsSinceEpoch;
+  int endEpoch = end.millisecondsSinceEpoch;
+  final dbClient = await AvailabilityDatabase.instance.database;
+
+  var count = await dbClient.rawQuery(
+      &#39;SELECT COUNT(*) FROM $_table WHERE timestamp &gt;= $startEpoch AND timestamp &lt;= $endEpoch&#39;);
+  print(Sqflite.firstIntValue(count));
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    park_buddy
+      1.0.3+4
+  </span>
+
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js"></script>
+<script src="../../static-assets/script.js"></script>
+
+
+
+</body>
+
+</html>
+
