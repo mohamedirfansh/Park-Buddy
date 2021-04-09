@@ -43,9 +43,24 @@ class MapViewState extends State<MapView> {
     setState(() {
       _markers.clear();
       _fillDataToMarkers(_markers, list);
+      if (list.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('No HDB carparks found in this area!', textAlign: TextAlign.center),
+            duration: const Duration(milliseconds: 3000),
+            width: 260.0, // Width of the SnackBar.
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0, // Inner padding for SnackBar content.
+            ),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+        );
+      }
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
