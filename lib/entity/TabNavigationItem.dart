@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:park_buddy/boundary/CarparkListView.dart';
-import 'package:park_buddy/control/MapViewWithSearch.dart';
+import 'package:park_buddy/control/SearchManager.dart';
 
 ///Entity class representing each tab in our tab view
 ///{@category Entity}
