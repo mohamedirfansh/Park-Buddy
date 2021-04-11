@@ -9,29 +9,35 @@ class OnBoardingPage extends StatelessWidget {
         child: IntroductionScreen(
           pages: [
             PageViewModel(
-              title: 'Parking lots',
-              body: 'Tap on carpark pin to view address and lot type',
-              image: buildImage('assets/images/carparks_near.png'),
+              title: 'Tap to Search',
+              body: 'Tap on the Search Bar and type to search for a destination.',
+              image: buildImage('assets/images/Search_Destination.png'),
               decoration: getPageDecoration(),
             ),
             PageViewModel(
-              title: 'Search destination',
+              title: 'Select a destination',
               body:
-              'Search for a location to find carparks near your destination',
-              image: buildImage('assets/images/search.png'),
+              'Tap on a suggested location to select it as your destination. The map will show any nearby carparks around your chosen destination.',
+              image: buildImage('assets/images/Select_Destination.png'),
               decoration: getPageDecoration(),
             ),
             PageViewModel(
-              title: 'Select the perfect parking lot',
+              title: 'Swap Views',
               body:
-              'Tap on the carpark pin label or card in List View to view carpark info like lot availability, distance & historic availability',
-              image: buildImage('assets/images/info_page.png'),
+              'Tap on the Map View or List View buttons on the bottom of the screen to swap between the Map and List Views.',
+              image: buildImage('assets/images/Swap_Views.png'),
+              decoration: getPageDecoration(),
+            ),
+            PageViewModel(
+              title: 'Get More Information',
+              body: 'Get more information about a specific carpark by tapping on a carpark pin label in the Map View, or a card in the List View.',
+              image: buildImage('assets/images/View_Info.png'),
               decoration: getPageDecoration(),
             ),
             PageViewModel(
               title: 'Get directions',
-              body: 'Get automatic directions to the carpark via Google Maps',
-              image: buildImage('assets/images/directions.png'),
+              body: 'Tap on "Get Directions via Google Maps" to get navigation instructions from your current location to your selected destination.',
+              image: buildImage('assets/images/Get_Directions.png'),
               decoration: getPageDecoration(),
             ),
           ],
